@@ -8,6 +8,7 @@
       - [まとめ](#まとめ)
   - [コントローラーと対応するViewの作成](#コントローラーと対応するviewの作成)
   - [DBにテーブル作成](#dbにテーブル作成)
+    - [既存テーブルの定義変更](#既存テーブルの定義変更)
   - [シンボルについて](#シンボルについて)
   - [フォームに入力されたデータを送信する。](#フォームに入力されたデータを送信する)
   - [フォームに初期値を表示する場合](#フォームに初期値を表示する場合)
@@ -16,7 +17,11 @@
   - [バリデーションエラー](#バリデーションエラー)
   - [確定後に表示するメッセージなど](#確定後に表示するメッセージなど)
   - [アクションを経由せずにViewを表示したい場合](#アクションを経由せずにviewを表示したい場合)
+  - [ログインの保持について](#ログインの保持について)
   - [共通のHTML](#共通のhtml)
+  - [全アクションで共通する処理](#全アクションで共通する処理)
+  - [ログインしていない場合のアクセス制限](#ログインしていない場合のアクセス制限)
+  - [ログインしていない場合のアクション制限](#ログインしていない場合のアクション制限)
 
 ## 疑問
 - C#みたいに定義に移動みたいな機能で呼び出し先や元に移動できたりする機能がないか。
@@ -113,6 +118,25 @@ INSERT時はモデルのインスタンスを作成後、Save;
   indexメソッド内に以下のように取得処理を記載できる。
   @posts = Post.all
 
+### 既存テーブルの定義変更
+1. マイグレーションファイルを作成する  
+db/migrateフォルダに、作成日時_add_image_name_to_usersでファイルが作成される。
+```cmd
+  rails g migration add_image_name_to_users
+```
+
+2. マイグレーションファイルを編集する
+```rb
+  def change
+    add_column(:users, :image_name, :string)
+  end
+```
+
+3. 実行する
+```cmd
+  rails db:migrate
+```
+
 ## シンボルについて
 - シンボルはRubyの特殊なデータ型で、名前の前にコロンを付けて表します。
 ```rb
@@ -167,7 +191,9 @@ form_tagが生成したHTML（開始フォームタグ）を出力するため�
 post/index
 
 ## getとpostの使い分け
-　データベースを変更するアクションかどうか
+- post
+  データベースを変更する場合
+  セッションを変更する場合
 
 ・link_toの仕様
 　link_toの第三引数に「{method: "post"}」を設定しないとgetを参照してしまう。
@@ -221,8 +247,62 @@ renderを使用する。
 redirect_toはURLを指定して「redirect_to(URL)」のように書きます。
 一方renderはビューファイルを指定して「render("フォルダ名/ファイル名")」とします。
 
+## ログインの保持について
+```rb
+session[:user_id]
+```
+- ログイン時、ブラウザに保存される。
+- 以降のアクセス、ブラウザから送信される。
+
+この値を元にヘッダ等の画面表示を切り替える。
+
 ## 共通のHTML
 views/layouts/application.html.erb
 top.html.erbなどの各ビューファイルは、この<%= yield %>の部分に代入され、
 application.html.erbの一部としてブラウザに表示されていました。
 この仕組みによって、ヘッダーなどの共通のレイアウトを1つにまとめることができます。
+
+## 全アクションで共通する処理
+全てのコントローラで共通する処理はapplicationコントローラにまとめる
+
+```rb
+before_action :set_current_user
+
+def set_current_user
+  @current_user = User.find_by(id: session[:user_id])
+end
+```
+
+## ログインしていない場合のアクセス制限
+onlyを用いて各コントローラでbefore_actionを使うことで、指定したアクションでのみそのメソッドを実行することができる
+条件に合致する場合にログインページにリダイレクトする。
+
+```rb
+#applicationコントローラ
+def authenticate_user
+  if @current_user == nil
+    flash[:notice] = "ログインが必要です"
+    redirect_to("/login")
+  end
+end
+```
+
+```rb
+#usersコントローラ
+before_action :authenticate_user, {only:[:index, :show, :edit, :update]}
+```
+
+
+## ログインしていない場合のアクション制限
+直接URLにアクセスしてアクションを行う場合の対策
+
+```rb
+before_action :ensure_correct_user, {only [:edit, :update]}
+
+def ensure_correct_user
+  if @current_user.id != params[:id].to_i
+    flash[:notice] = "権限がありません"
+    redirect_to("/posts/index")
+  end
+end
+```
