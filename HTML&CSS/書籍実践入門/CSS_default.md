@@ -1,8 +1,20 @@
 # CSS_default
 
+- [CSS\_default](#css_default)
+  - [共通](#共通)
+    - [html](#html)
+    - [body](#body)
+    - [img](#img)
+    - [メディアクエリのブレイクポイント](#メディアクエリのブレイクポイント)
+  - [header](#header)
+    - [wrapper](#wrapper)
+    - [.header](#header-1)
+    - [displayプロパティについて](#displayプロパティについて)
+
+
+## 共通
 ```css
 @charset "UTF-8";
-
 html {
   font-size: 100%;
 }
@@ -83,3 +95,36 @@ img {
   margin: 0 auto;
 }
 ```
+
+### .header
+
+- 「display: flex」要素が横並びになる。
+- 「align-items: center」要素が縦方向の中心に配置される。
+- 「justify-content: space-between」横方向に均等割り付けされる。
+これでヘッダ画像が左端にグローバルナビゲーションが右側に表示される。
+
+```css
+#header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 35px;
+  padding-bottom: 35px;
+}
+```
+
+### displayプロパティについて
+- inline
+要素は横に並ぶ。横幅や高さは指定できない。主に文章の一部として使用する。
+- inline-block
+要素は横に並ぶ。横幅、高さ、余白の調整が可能。
+- block
+要素は縦に並ぶ。横幅、高さ、予約の調整が可能。
+inlineの要素を縦に並べたい場合に使用。
+- flex
+要素は横に並ぶ。
+- grid
+格子状のマス目を使ってレイアウトを組み立てていく手法
+- none
+要素を非表示。
+要素の表示切替で使用する。
