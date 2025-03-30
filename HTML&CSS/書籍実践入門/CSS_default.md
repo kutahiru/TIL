@@ -10,6 +10,8 @@
     - [wrapper](#wrapper)
     - [.header](#header-1)
     - [displayプロパティについて](#displayプロパティについて)
+    - [レスポンシブ対応](#レスポンシブ対応)
+    - [要素の固定](#要素の固定)
 
 
 ## 共通
@@ -20,7 +22,7 @@ html {
 }
 body {
   color: #707070;
-  font-family: sans-serif;
+  font-family: 'YuGothic', 'Yu Gothic', sans-serif;
 }
 img {
   max-width: 100%;
@@ -59,7 +61,7 @@ html {
 ```css
 body {
   color: #707070;
-  font-family: sans-serif;
+  font-family: 'YuGothic', 'Yu Gothic', sans-serif;
 }
 ```
 
@@ -76,8 +78,7 @@ img {
 
 ### メディアクエリのブレイクポイント
 - 基本がPCでスマホ用のブレイクポイントを設定する場合は、「767px」
-- 基本はスマホでPC用のブレイクポイントを設定する場合は、「1025px」
-
+- 基本はスマホでPC用のブレイクポイントを設定する場合は、「1025px
 
 ## header
 
@@ -128,3 +129,59 @@ inlineの要素を縦に並べたい場合に使用。
 - none
 要素を非表示。
 要素の表示切替で使用する。
+
+### レスポンシブ対応
+- 余白の調整
+```css
+margin-bottom: 50px;
+```
+
+- フォントサイズと位置の調整
+```css
+font-size: 16px;
+text-align: left;
+```
+
+- 横並びだったものを縦並びに変更
+以下は表示順も逆順に変更している
+```css
+flex-direction: column-reverse;
+```
+
+- 画像等のサイズを変更
+```css
+width: 100%;
+```
+
+
+### 要素の固定
+- 左上を基準に上から100px,左から200pxの位置に固定される。
+レスポンシブ対応ではtop: 10px、left: 20px
+```css
+position: fixed
+top: 100px
+left: 200px
+```
+
+- 元の位置を基準に上から100px,左から200px移動する。
+```css
+position: relative
+top: 100px
+left: 200px
+```
+
+- ウィンドウを基準に上から100px,左から200px移動する。fixedと異なり固定されない。
+※親要素にrelativeの指定なし。
+```css
+position: absolute
+top: 100px
+left: 200px
+```
+
+- 親要素を基準に上から100px,左から200px移動する。
+※親要素にrelativeの指定あり。
+```css
+position: absolute
+top: 100px
+left: 200px
+```
