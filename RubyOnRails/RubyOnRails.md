@@ -13,7 +13,9 @@
   - [フォームに入力されたデータを送信する。](#フォームに入力されたデータを送信する)
   - [フォームに初期値を表示する場合](#フォームに初期値を表示する場合)
   - [特に理由がない場合は絶対パスを使用する。](#特に理由がない場合は絶対パスを使用する)
+  - [link\_toでHTMLを表示したい場合](#link_toでhtmlを表示したい場合)
   - [getとpostの使い分け](#getとpostの使い分け)
+  - [バリデーションはモデルで設定する](#バリデーションはモデルで設定する)
   - [バリデーションエラー](#バリデーションエラー)
   - [確定後に表示するメッセージなど](#確定後に表示するメッセージなど)
   - [アクションを経由せずにViewを表示したい場合](#アクションを経由せずにviewを表示したい場合)
@@ -192,6 +194,15 @@ form_tagが生成したHTML（開始フォームタグ）を出力するため�
 理由があれば相対パスを使用する。
 post/index
 
+## link_toでHTMLを表示したい場合
+第一引数ではなく、以下の用に記載する必要がある。
+
+```rb
+<%= link_to("/likes/#{@post.id}/destroy", {method: "post"}) do %>
+  <span class="fa fa-heart liked-btn"></span>
+<% end %>   
+```
+
 ## getとpostの使い分け
 - post
   データベースを変更する場合
@@ -203,7 +214,7 @@ post/index
 　<%= link_to("削除", "/posts/#{@post.id}/edit", {method: "post"}) %>
 ```
 
-■バリデーションはモデルで設定する
+## バリデーションはモデルで設定する
 ```rb
 validates(:content, {presence: true})
 validates(:content, {presence: true, length: {maximum: 140}})

@@ -19,8 +19,12 @@
   - [埋め込みコード(ERBタグ)](#埋め込みコードerbタグ)
   - [フォントファミリーを指定する際のルール](#フォントファミリーを指定する際のルール)
   - [positionプロパティについて](#positionプロパティについて)
+  - [要素の固定](#要素の固定)
+  - [absoluteにより高さがなくなる](#absoluteにより高さがなくなる)
   - [z-indexプロパティについて](#z-indexプロパティについて)
   - [object-fitプロパティについて](#object-fitプロパティについて)
+  - [複数行の日本語表記をきれいに揃える](#複数行の日本語表記をきれいに揃える)
+  - [透過について](#透過について)
   - [アイコン](#アイコン)
   - [開発者モード](#開発者モード)
 
@@ -34,10 +38,18 @@
 その外側の余白はmargin, 内側の余白はpaddingです。
 
 ## 枠組み
+- 大きな枠組み
 body
 　header
 　main
 　footer
+
+- sectionの枠組み
+section
+　div
+　　h2
+　　div
+
 
 ## divタグとsectionタグの違い
 sectionタグは文章やコンテンツの一つのまとまりを作るために使用する。
@@ -155,6 +167,49 @@ font-family: 'YuGothic', 'Yu Gothic', sans-serif;
 親要素の中で固定されて表示される。
 サイドバーの追従バナー等で使用される。
 
+## 要素の固定
+- 左上を基準に上から100px,左から200pxの位置に固定される。
+レスポンシブ対応ではtop: 10px、left: 20px
+またはレスポンシブ対応のため%で指定する。
+```css
+position: fixed
+top: 100px
+left: 200px
+```
+
+- 元の位置を基準に上から100px,左から200px移動する。
+```css
+position: relative
+top: 100px
+left: 200px
+```
+
+- ウィンドウを基準に上から100px,左から200px移動する。fixedと異なり固定されない。
+※親要素にrelativeの指定なし。
+```css
+position: absolute
+top: 100px
+left: 200px
+```
+
+- 親要素を基準に上から100px,左から200px移動する。
+※親要素にrelativeの指定あり。
+```css
+position: absolute
+top: 100px
+left: 200px
+```
+
+- リセットする場合
+```css
+position: static;
+```
+
+## absoluteにより高さがなくなる
+子要素が全てabsoluteの場合、親要素の高さが0になってしまう。
+そのため親要素に明示的に高さを設定する必要がある。
+
+
 ## z-indexプロパティについて
 要素の重なり順序を制御している。
 基本は10毎に採番する。後でメンテしやすいため。
@@ -171,9 +226,22 @@ font-family: 'YuGothic', 'Yu Gothic', sans-serif;
 表示位置を固定することができる。
 左寄せでトリミングを行うなどが可能となる。
 
+## 複数行の日本語表記をきれいに揃える
+```css
+text-align: justify;
+```
+
+## 透過について
+rgbaで透過した場合は指定の色だけが透過するので背景のみ透過し、文字を透過させないことができる。
+opacityで透過した場合は文字も含めて透過する。
+
+
 ## アイコン
 ・Font Awesome  
 https://fontawesome.com 
+```html
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+```
 
 ## 開発者モード
 - 左上の矢印で選択モード

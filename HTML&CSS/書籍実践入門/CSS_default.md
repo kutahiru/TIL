@@ -185,3 +185,8 @@ position: absolute
 top: 100px
 left: 200px
 ```
+
+- リセットする場合
+```css
+position: static;
+```
