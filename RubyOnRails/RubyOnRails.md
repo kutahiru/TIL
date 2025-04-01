@@ -25,6 +25,9 @@
   - [ログインしていない場合のアクセス制限](#ログインしていない場合のアクセス制限)
   - [ログインしていない場合のアクション制限](#ログインしていない場合のアクション制限)
   - [コントローラで使用する処理をモデルにメソッドで用意する](#コントローラで使用する処理をモデルにメソッドで用意する)
+  - [Gem](#gem)
+    - [bcrypt ハッシュ化する](#bcrypt-ハッシュ化する)
+    - [has\_secure\_passwordのメタプログラミングについて](#has_secure_passwordのメタプログラミングについて)
 
 ## 疑問
 - C#みたいに定義に移動みたいな機能で呼び出し先や元に移動できたりする機能がないか。
@@ -324,3 +327,54 @@ end
 Railsではモデル内にインスタンスメソッドを定義することができる。
 Postモデル内で定義したインスタンスメソッドは
 コントローラーでpostインスタンスに対して用いることができる。
+
+## Gem
+Gemfile
+gem 'gemの名前'
+
+```cmd
+bundle install
+```
+
+### bcrypt ハッシュ化する
+```rb
+gem 'bcrypt'
+```
+
+コントロールに「has_secure_password」を追加する。
+```rb
+class User < ApplicationRecord
+  has_secure_password
+end
+```
+
+内部的には以下の処理と同じ
+- passwordとpassword_confirmationという仮想属性（attr_accessor）を追加
+- passwordに値が設定されると、それをハッシュ化してpassword_digestカラムに保存するコールバックを追加
+- 新規レコード作成時にpasswordの存在を確認(バリデーションの追加)
+- password_confirmationが設定されている場合、passwordとの一致を確認
+- ユーザー認証のためのauthenticateメソッドを追加
+
+※password_digestをテーブルに用意する必要はある。
+
+### has_secure_passwordのメタプログラミングについて
+```rb
+# 擬似コード
+def self.has_secure_password(options = {})
+  # クラスにモジュールを追加
+  include InstanceMethodsOnActivation
+  
+  # 動的にメソッドを定義
+  define_method(:authenticate) do |unencrypted_password|
+    # 認証ロジック
+  end
+  
+  define_method(:password=) do |unencrypted_password|
+    # パスワード設定ロジック
+  end
+  
+  # バリデーションを追加
+  validates_presence_of :password, if: -> { password_digest.blank? }
+  # その他の設定...
+end
+```
