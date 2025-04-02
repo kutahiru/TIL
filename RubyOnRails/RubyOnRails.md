@@ -25,7 +25,7 @@
   - [ログインしていない場合のアクセス制限](#ログインしていない場合のアクセス制限)
   - [ログインしていない場合のアクション制限](#ログインしていない場合のアクション制限)
   - [コントローラで使用する処理をモデルにメソッドで用意する](#コントローラで使用する処理をモデルにメソッドで用意する)
-  - [Gem](#gem)
+  - [Gemのインストール](#gemのインストール)
     - [bcrypt ハッシュ化する](#bcrypt-ハッシュ化する)
     - [has\_secure\_passwordのメタプログラミングについて](#has_secure_passwordのメタプログラミングについて)
 
@@ -135,6 +135,7 @@ db/migrateフォルダに、作成日時_add_image_name_to_usersでファイル�
 ```rb
   def change
     add_column(:users, :image_name, :string)
+    remove_column(:users, :password, :string)
   end
 ```
 
@@ -198,7 +199,7 @@ form_tagが生成したHTML（開始フォームタグ）を出力するため�
 post/index
 
 ## link_toでHTMLを表示したい場合
-第一引数ではなく、以下の用に記載する必要がある。
+第一引数ではなく、以下のように記載する必要がある。
 
 ```rb
 <%= link_to("/likes/#{@post.id}/destroy", {method: "post"}) do %>
@@ -328,7 +329,7 @@ Railsではモデル内にインスタンスメソッドを定義することが
 Postモデル内で定義したインスタンスメソッドは
 コントローラーでpostインスタンスに対して用いることができる。
 
-## Gem
+## Gemのインストール
 Gemfile
 gem 'gemの名前'
 
@@ -341,7 +342,7 @@ bundle install
 gem 'bcrypt'
 ```
 
-コントロールに「has_secure_password」を追加する。
+モデルに「has_secure_password」を追加する。
 ```rb
 class User < ApplicationRecord
   has_secure_password
