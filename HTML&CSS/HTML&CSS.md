@@ -9,6 +9,7 @@
   - [Flexbox](#flexbox)
     - [基本](#基本)
     - [折り返し](#折り返し)
+  - [Flexbox使用時の子要素の配置](#flexbox使用時の子要素の配置)
   - [containerクラスが重要](#containerクラスが重要)
   - [インライン要素について](#インライン要素について)
     - [使い分け](#使い分け)
@@ -27,8 +28,8 @@
   - [displayプロパティについて](#displayプロパティについて)
   - [透過について](#透過について)
   - [透過を利用した画像の合成](#透過を利用した画像の合成)
-  - [中央に配置したい場合](#中央に配置したい場合)
   - [要素を左右どちらかに詰めて配置したい場合](#要素を左右どちらかに詰めて配置したい場合)
+  - [疑似要素](#疑似要素)
   - [アイコンAwesome](#アイコンawesome)
   - [開発者モード](#開発者モード)
 
@@ -86,6 +87,27 @@ flex-wrap: wrap
 ```css
 width: 50%
 ```
+
+## Flexbox使用時の子要素の配置
+- 垂直方向の中央
+```css
+align-items: center
+```
+
+- 水平方向の中央
+```css
+justify-content: center;
+```
+
+- コンテナ内のアイテムを均等に配置する
+```css
+#footer .inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+```
+
 
 ## containerクラスが重要
 
@@ -275,17 +297,6 @@ background-color: rgba(255, 255, 255, 0.5);
 background-blend-mode: lighten;
 ```
 
-## 中央に配置したい場合
-垂直方向の中央
-```css
-align-items: center
-```
-
-水平方向の中央
-```css
-justify-content: center;
-```
-
 ## 要素を左右どちらかに詰めて配置したい場合
 要素の左側のマージンを自動的に計算して、利用可能なスペースをすべて左マージンに割り当てる。
 そのため、要素は右側に配置される。
@@ -294,6 +305,34 @@ justify-content: center;
 margin-left: auto;
 max-width: 520px
 ```
+
+## 疑似要素
+要素にスタイルをつける。
+- ::bofore 要素の直前にコンテンツを追加する。
+contentプロパティに追加するテキストを設定する。画像を追加することもできる。
+
+```css
+/*テキストの直前に「・」を追加する*/
+.sample ::before{
+  content: "・";
+}
+```
+
+- ::after 要素の直後にコンテンツを追加する。
+
+```css
+/*ボタンの右端に黒いラインをひく*/
+.online-store .box .btn::after {
+  content: "";
+  width: 40px;
+  height: 1px;
+  background-color: #333;
+  position: absolute;
+  top: 20px;
+  right: -20px;
+}
+```
+
 
 ## アイコンAwesome  
 ・Font Awesome  
