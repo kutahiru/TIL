@@ -30,6 +30,11 @@
   - [透過を利用した画像の合成](#透過を利用した画像の合成)
   - [要素を左右どちらかに詰めて配置したい場合](#要素を左右どちらかに詰めて配置したい場合)
   - [疑似要素](#疑似要素)
+  - [斜めにラインの入った背景を設定する](#斜めにラインの入った背景を設定する)
+  - [改行をメディアクエリで制御する。](#改行をメディアクエリで制御する)
+  - [jQueryの利用](#jqueryの利用)
+  - [ハンバーガーメニュー](#ハンバーガーメニュー)
+  - [toggleClassとaddClassとremoveClassについて](#toggleclassとaddclassとremoveclassについて)
   - [アイコンAwesome](#アイコンawesome)
   - [開発者モード](#開発者モード)
 
@@ -332,6 +337,159 @@ contentプロパティに追加するテキストを設定する。画像を追�
   right: -20px;
 }
 ```
+
+## 斜めにラインの入った背景を設定する
+```css
+.mainvisual {
+  background-color: #ffed58;
+  clip-path: polygon(0 0, 100% 0, 100% 80%, 0 100%);
+  padding: 70px 0 160px;
+  margin-bottom: 40px;
+}
+```
+
+
+## 改行をメディアクエリで制御する。
+brのクラスを設定することで制御する。
+
+```html
+<span>プログラミングで</span><br><span>未来の扉を</span><br class="pc"><span>ひらこう</span>
+```
+
+```css
+  .pc {
+    display: none;
+  }
+```
+
+## jQueryの利用
+
+
+```html
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<script src="js/main.js"></script>
+```
+
+## ハンバーガーメニュー
+スマートフォン利用時のヘッダ部にある3本線のこと。
+
+```html
+<div class="hamburger">
+  <span></span>
+  <span></span>
+  <span></span>
+</div>
+<nav class="navi">
+  <ul class="menu">
+    <li><a href="index.html">トップ</a></li>
+    <li><a href="service.html">サービス</a></li>
+    <li><a href="price.html">料金</a></li>
+    <li><a href="contact.html">お問い合わせ</a></li>
+  </ul>
+</nav>
+```
+
+```css
+@media screen and (max-width: 767px) {
+  #header .hamburger {
+    width: 50px;
+    height: 50px;
+    cursor: pointer;
+    position: fixed;
+    top: 5px;
+    right: 10px;
+    z-index: 30;
+  }
+  #header .hamburger span {
+    width: 30px;
+    height: 3px;
+    background-color: #000;
+    display: inline-block;
+    position: absolute;
+    left: 10px;
+    transition: all 0.4s;
+  }
+  #header .hamburger span:nth-of-type(1) {
+    top: 16px; 
+  }
+  #header .hamburger span:nth-of-type(2) {
+    top: 25px;
+  }
+  #header .hamburger span:nth-of-type(3) {
+    top: 34px;
+  }
+  #header .navi.active {
+    right: 0;
+  }
+
+  #header .navi {
+    width: 80%;
+    height: 100vh;
+    background-color: #fff;
+    position: fixed;
+    top: 0;
+    right: -80%;
+    z-index: 20;
+    transition: all 0.6s;
+  }
+
+  #header .navi .menu {
+    width: 100%;
+    height: 100vh;
+    flex-direction: column;
+    padding: 60px 0;
+    overflow: auto;
+  }
+
+  #header .navi .menu li {
+    padding: 10px 0;
+    margin-left: 0;
+  }
+}
+```
+
+- ボタンを×にするCSS(ボタンのアニメーション)
+```css
+  #header .hamburger.active span:nth-of-type(1) {
+    top: 24px;
+    transform: rotate(-45deg);
+  }
+  #header .hamburger.active span:nth-of-type(2) {
+    opacity: 0;
+  }
+  #header .hamburger.active span:nth-of-type(3) {
+    top: 24px;
+    transform: rotate(45deg);
+  }
+```
+
+- jQueryでactiveクラスの追加、削除を行う処理を作成
+```js
+$(function(){
+  /*-------------------------------
+  ハンバーガーメニュー
+  ---------------------------------*/
+  $(".hamburger").click(function () {
+    $(this).toggleClass("active");
+    $("#header .navi").toggleClass("active");
+  });
+  
+  $(".navi a").click(function () {
+    $(".hamburger").removeClass("active");
+    $("#header .navi").removeClass("active");
+  });
+});
+```
+
+## toggleClassとaddClassとremoveClassについて
+- toggleClass
+  対象となる要素に指定したクラスが存在していれば削除、存在しなければ追加を行う。
+
+- addClass
+  対象の要素に指定したクラスを追加する。
+
+- removeClass
+  対象の要素から指定したクラスを削除する。
 
 
 ## アイコンAwesome  
