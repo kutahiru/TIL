@@ -101,6 +101,19 @@ chars = ["a", "b", "c"]
 chars.sum(">") {|c| c.upcase} 
 ```
 
+#### each_with_index
+何番目の要素を処理しているか判別可能
+```rb
+fruits = ["apple", "orange", "melon"]
+fruits.each_with_index { |fruit, i| puts "#{i}: #{fruit}" }
+```
+
+#### with_index
+map等のメソッドで利用可能。また、初期値を指定可能
+```rb
+fruits.map.with_index(2) { |fruit, i| puts "#{i}: #{fruit}" }
+```
+
 
 ### 範囲オブジェクト
 条件の判定や、case文で使える。
