@@ -36,6 +36,7 @@
   - [ハンバーガーメニュー](#ハンバーガーメニュー)
   - [toggleClassとaddClassとremoveClassについて](#toggleclassとaddclassとremoveclassについて)
   - [アイコンAwesome](#アイコンawesome)
+  - [CSSフレームワーク](#cssフレームワーク)
   - [開発者モード](#開発者モード)
 
 
@@ -498,6 +499,19 @@ https://fontawesome.com
 ```html
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
 ```
+
+## CSSフレームワーク
+Tailwind CSS
+Bootstrap、Tailwind CSS、Foundationなど
+
+CDNを使用してTailwind CSSを読み込む方法
+```html
+<head>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+```
+公式Doc
+https://tailwindcss.com/docs/installation/using-vite
 
 ## 開発者モード
 - 左上の矢印で選択モード
