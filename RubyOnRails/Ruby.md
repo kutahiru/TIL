@@ -1,41 +1,10 @@
 # Ruby
 
-- [Ruby](#ruby)
-    - [疑問](#疑問)
-    - [便利な書き方](#便利な書き方)
-      - [条件分岐で変数に代入](#条件分岐で変数に代入)
-      - [nilの時にエラーを回避する方法](#nilの時にエラーを回避する方法)
-      - [nilガード、Or Equals演算子](#nilガードor-equals演算子)
-      - [分岐を伴わないIF文は不要となる。？](#分岐を伴わないif文は不要となる)
-    - [ヒアドキュメント](#ヒアドキュメント)
-    - [論理演算子 \&\& ||の利用について](#論理演算子--の利用について)
-      - [!!を使った論理値の型変換](#を使った論理値の型変換)
-    - [or and について](#or-and-について)
-    - [%記法について](#記法について)
-    - [代入について](#代入について)
-    - [!で終わるメソッドは破壊的メソッド](#で終わるメソッドは破壊的メソッド)
-    - [ブロックについて](#ブロックについて)
-    - [ブロックを使う配列のメソッド](#ブロックを使う配列のメソッド)
-      - [map](#map)
-      - [select](#select)
-      - [find](#find)
-      - [sum](#sum)
-      - [join](#join)
-      - [each\_with\_index](#each_with_index)
-      - [with\_index](#with_index)
-      - [ハッシュのeach](#ハッシュのeach)
-    - [範囲オブジェクト](#範囲オブジェクト)
-    - [シンボルについて](#シンボルについて)
-    - [ハッシュについて](#ハッシュについて)
-  - [自動テストについて](#自動テストについて)
-    - [Minitest](#minitest)
-    - [RSpec](#rspec)
-
 
 ### 疑問
 - or andについて純粋な制御フローの場合のみ使用するという記載があった。
   実際にはどんな感じなのか。以下はどっちで実装するべき？
-```rb
+```ruby
 #正常なユーザーであればメールを送信する。
 user.valid? && send_email_to(user)
 ```
@@ -45,7 +14,8 @@ user.valid? && send_email_to(user)
 #### 条件分岐で変数に代入
 変数への代入自体が戻り値を持つから可能となる。
 条件部を==と間違えたかもしれないと推測されることもあるので、この実装はしない。
-```rb
+
+```ruby
 if currency = find_currency(country)
   currency.upcase
 end
@@ -58,7 +28,7 @@ end
 
 #### nilガード、Or Equals演算子
 limitがnilかfalseなら10を代入するコード
-```rb
+```ruby
 #以下は全て書き換えなので同じ
 #この書き方が一般的
 limit ||= 10
@@ -71,7 +41,7 @@ limit = limit || 10
 ```
 
 #### 分岐を伴わないIF文は不要となる。？
-```rb
+```ruby
 add = true
 a = 1
 b = 2
@@ -84,7 +54,82 @@ if add
 end
 ```
 
+
+
+### 注意点
+
+#### 真偽値
+
+nilはfalseとして扱われる
+
+### 変数展開
+
+#{変数名}
+
+```ruby
+puts "面積は#{area}です"
+```
+
+### クラスの定義
+
+```ruby
+■クラスの定義
+# Menuクラスを移動したら、menu.rbを読み込んでください
+class Menu
+  attr_accessor :name
+  attr_accessor :price
+  
+  def initialize(name:, price:)
+    self.name = name
+    self.price = price
+  end
+  
+  def info
+    return "#{self.name} #{self.price}円"
+  end
+  
+  def get_total_price(count)
+    total_price = self.price * count
+    if count >= 3
+      total_price -= 100
+    end
+    return total_price
+  end
+end
+```
+
+オーバーライド
+同名メソッド作るだけ。
+親メソッドをCALLする場合は、同名メソッド内でsuper(引数)
+
+```ruby
+使用する側で以下
+require "./menu"
+menu1 = Menu.new(name: "ピザ", price: 800)
+
+継承
+require "./menu"
+class Food <  Menu
+end
+```
+
+### foreach
+
+```ruby
+languages = ["日本語", "英語", "スペイン語"]
+# each文を用いて、要素ごとに「○○を話せます」と出力してください
+languages.each do |language|
+  puts "#{language}を話せます"
+end
+```
+
+### 入力待ち状態
+
+gets.chomp
+gets.chomp.to_i　数値変換
+
 ### ヒアドキュメント
+
 複数行にわたる改行の場合に使用する。
 <<SQL
 SELECT
@@ -94,7 +139,7 @@ SQL
 
 ### 論理演算子 && ||の利用について
 最後に評価した式の値を返す。
-```rb
+```ruby
 #最初に見つかったユーザーを変数に格納する。
 user = find_user("Alice") || find_user("Bob") || find_user("Carol")
 
@@ -111,7 +156,8 @@ IF文を実装せずとも、!!を使用することが可能。
 最初の!は存在していればfalseになる。この部分が型変換を指している。
 !!をつけると、!の状態の存在していればfalseを反転するため、trueになる。
 !で型をboolにする。!!で正しいbool値にするということ。
-```rb
+
+```ruby
 nil_value = nil
 !nil_value  # => true (nilは偽値なので、その否定はtrue)
 !!nil_value # => false (trueの否定はfalse)
@@ -159,7 +205,7 @@ Rubyが最後に評価した式を戻り値として返す仕様のため。
 
 下の例は呼び出した自身の値も変更する。
 
-```rb
+```ruby
 a = "ruby"
 
 a.upcase! #戻り値はRUBY
@@ -178,14 +224,14 @@ a #aの値もRUBYに変更される。
 
 #### map
 配列の各要素に対して、ブロックを評価した結果を新しい配列として返す。
-```rb
+```ruby
 numbers = [1, 2, 3, 4, 5]
 new_numbers = numbers.map {|n| n * 10}
 ```
 
 #### select
 配列の各要素に対して、ブロックを評価し、戻り値が真の要素を集めた配列を返す。
-```rb
+```ruby
 numbers = [1, 2, 3, 4, 5]
 even_numbers = numbers.select {|n| n.even? }
 ```
@@ -198,34 +244,34 @@ even_numbers = numbers.select {|n| n.even? }
 
 #### join
 配列の要素を連結して一つの文字列にする。
-```rb
+```ruby
 chars = ["a", "b", "c"]
 chars.join("-") #区切り文字をハイフンにして連結する。
 ```
 
 sumメソッドを使うと、初期値(先頭の文字)を与えたり、
 ブロックないで文字列を加工することができる。
-```rb
+```ruby
 chars = ["a", "b", "c"]
 chars.sum(">") {|c| c.upcase} 
 ```
 
 #### each_with_index
 何番目の要素を処理しているか判別可能
-```rb
+```ruby
 fruits = ["apple", "orange", "melon"]
 fruits.each_with_index { |fruit, i| puts "#{i}: #{fruit}" }
 ```
 
 #### with_index
 map等のメソッドで利用可能。また、初期値を指定可能
-```rb
+```ruby
 fruits.map.with_index(2) { |fruit, i| puts "#{i}: #{fruit}" }
 ```
 
 #### ハッシュのeach
 ハッシュなので、ブロックパラメータが二つになる。
-```rb
+```ruby
 currencies = {japan: "yen", us: "dollar", india: "rupee"}
 currencies.each do |key, value|
   puts "#{key}: #{value}"
@@ -234,7 +280,7 @@ end
 
 ### 範囲オブジェクト
 条件の判定や、case文で使える。
-```rb
+```ruby
 1..5 #1以上5以下
 1...5 #1以上5未満
 ```
@@ -246,7 +292,7 @@ end
 - イミュータブルなので、勝手に値を変更されることがない。
 
 ### ハッシュについて
-```rb
+```ruby
 #空のハッシュの宣言
 hash = {}
 
@@ -259,7 +305,7 @@ hash = { key1: "value1", key2: "value2"}
 ### Minitest
 Minitestはクラス内のtest_で始まるメソッドを全て実行する。
 「assert_equal」は検証メソッド
-```rb
+```ruby
 require "minitest/autorun"
 require_relative "../lib/fizz_buzz" #テスト対象のファイル
 

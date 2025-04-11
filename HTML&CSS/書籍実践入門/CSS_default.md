@@ -1,17 +1,5 @@
 # CSS_default
 
-- [CSS\_default](#css_default)
-  - [共通](#共通)
-    - [html](#html)
-    - [body](#body)
-    - [img](#img)
-    - [メディアクエリのブレイクポイント](#メディアクエリのブレイクポイント)
-  - [header](#header)
-    - [wrapper](#wrapper)
-    - [.header](#header-1)
-    - [displayプロパティについて](#displayプロパティについて)
-    - [レスポンシブ対応](#レスポンシブ対応)
-
 
 ## 共通
 ```css
@@ -153,5 +141,4 @@ flex-direction: column-reverse;
 ```css
 width: 100%;
 ```
-
 
