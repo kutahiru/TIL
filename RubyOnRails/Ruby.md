@@ -54,7 +54,15 @@ if add
 end
 ```
 
+#### 可変長引数
 
+```ruby
+def greet(*names)
+  names.each do |name|
+    puts "Hello, #{name}!"
+  end
+end
+```
 
 ### 注意点
 
@@ -131,7 +139,9 @@ gets.chomp.to_i　数値変換
 ### ヒアドキュメント
 
 複数行にわたる改行の場合に使用する。
-<<SQL
+「-」は閉じの「SQL」を先頭に置かなくても良くなる。
+
+<<-SQL
 SELECT
   *
 FROM table
@@ -229,7 +239,7 @@ numbers = [1, 2, 3, 4, 5]
 new_numbers = numbers.map {|n| n * 10}
 ```
 
-#### select
+#### select または filter
 配列の各要素に対して、ブロックを評価し、戻り値が真の要素を集めた配列を返す。
 ```ruby
 numbers = [1, 2, 3, 4, 5]
@@ -278,7 +288,17 @@ currencies.each do |key, value|
 end
 ```
 
+### 配列操作
+
+重複を削除した新しい配列を作成
+
+```ruby
+numbers = [1, 2, 2, 3, 4, 4, 5, 5, 5]
+unique_numbers = numbers.uniq
+```
+
 ### 範囲オブジェクト
+
 条件の判定や、case文で使える。
 ```ruby
 1..5 #1以上5以下
@@ -299,6 +319,39 @@ hash = {}
 #シンボルを使用したハッシュの宣言
 hash = { key1: "value1", key2: "value2"}
 ```
+
+### ハッシュの操作
+
+#### マージ処理
+
+キーが重複している場合、上書きされる。
+
+```ruby
+hash1 = { name: "Alice", age: 30 }
+hash2 = { city: "Wonderland" }
+hash3 = { name: "Bob", age: 20 }
+
+merged_hash = hash1.merge(hash2)
+puts merged_hash
+
+merged_hash_with_conflict = hash1.merge(hash3)
+puts merged_hash_with_conflict
+```
+
+### SQLへの接続方法
+
+```ruby
+require "sqlite3"
+db = SQLite3::Database.new 'db/kakeibo.db'
+```
+
+select文の実行
+
+```ruby
+categories = db.execute('SELECT * FROM categories')
+```
+
+
 
 ## 自動テストについて
 
