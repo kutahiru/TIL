@@ -106,7 +106,7 @@ class Menu
 end
 ```
 
-オーバーライド
+### 継承とオーバーライド
 同名メソッド作るだけ。
 親メソッドをCALLする場合は、同名メソッド内でsuper(引数)
 
@@ -119,6 +119,121 @@ menu1 = Menu.new(name: "ピザ", price: 800)
 require "./menu"
 class Food <  Menu
 end
+```
+
+### セッターメソッドの定義方法
+
+「name=」という名前のメソッドを定義
+単純な処理ではattr_accessorを使用すれば良い。
+
+```ruby
+def name=(name)
+  @name = name
+end
+
+#使用する側
+#内部的にはobj.name=("山田太郎")というメソッド呼び出し
+obj.name = "山田太郎"
+```
+
+### クラスメソッド
+
+インスタンスからは呼び出せないメソッド
+self.をつける
+
+```ruby
+class Person
+  def self.adulthood_age_text
+    "成人年齢は18才です"
+  end
+end
+
+#呼び出し
+puts Person.adulthood_age_text
+```
+
+### privateメソッド
+クラスの内部からのみ呼び出すことができるメソッド
+
+```ruby
+private  # この行以降のメソッドはプライベートになる
+```
+
+### モジュール
+
+モジュールに定義したメソッドは、
+クラスにincludeキーワード、extendキーワードを使って組み込むことができる。
+
+#### include
+
+モジュールのメソッドをクラスの**インスタンスメソッド**として取り込む
+
+```ruby
+module Greeting
+  def hello
+    "Hello!"
+  end
+end
+
+class Person
+  include Greeting
+  attr_accessor :name, :age
+
+  def initialize(name, age)
+    @name = name
+    @age = age
+  end
+end
+
+person = Person.new("太郎", 30)
+puts person.hello
+```
+
+#### extend 
+
+モジュールのメソッドをクラスの**クラスメソッド**として取り込む
+
+```ruby
+module Greeting
+  def hello
+    "Hello!"
+  end
+end
+
+class Person
+  extend Greeting
+end
+
+puts Person.hello
+```
+
+#### 定数
+
+```ruby
+module Greeting
+  HELLO = "Hello!"
+end
+
+class Person
+  include Greeting
+
+  def hello
+    HELLO
+  end
+end
+
+person = Person.new
+puts person.hello
+puts Greeting::HELLO
+```
+
+### 名前空間解決演算子
+
+Net`モジュール内の`HTTP`クラスの`get_responseメソッドを呼び出している
+Net::HTTP`はNet`モジュール内の`HTTP`クラスを参照している
+
+```ruby
+Net::HTTP.get_response(uri)
 ```
 
 ### foreach
@@ -351,13 +466,59 @@ select文の実行
 categories = db.execute('SELECT * FROM categories')
 ```
 
+### HHTP通信
 
+```ruby
+require 'net/http'
+require 'uri'
+
+uri = URI.parse("http://www.example.com")
+response = Net::HTTP.get_response(uri)
+
+puts response.code
+puts response.body
+```
+
+### 例外処理
+
+`begin`ブロック内で例外が発生する可能性のある処理を記述
+`rescue`ブロックで例外が発生した場合の処理を記述
+
+```ruby
+begin
+  1 / 0
+rescue ZeroDivisionError => e
+  puts "ZeroDivisionError: #{e.message}"
+end
+
+#↑は特定のエラーなので、全てのエラーをキャッチしたい場合は以下
+begin
+  # 何らかの処理
+rescue => e #発生した例外をeに代入
+  puts "エラーが発生しました: #{e.message}"
+end
+```
+
+### JSONファイルの操作
+
+```ruby
+require 'json'
+
+json_string = '{"name": "John", "age": 30, "is_student": false, "courses": ["Math", "Science", "History"]}'
+data = JSON.parse(json_string)
+
+puts data["name"]
+puts data["age"]
+puts data["is_student"]
+puts data["courses"]
+```
 
 ## 自動テストについて
 
 ### Minitest
 Minitestはクラス内のtest_で始まるメソッドを全て実行する。
 「assert_equal」は検証メソッド
+
 ```ruby
 require "minitest/autorun"
 require_relative "../lib/fizz_buzz" #テスト対象のファイル
