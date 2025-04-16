@@ -1,3 +1,5 @@
+
+
 # Ruby
 
 
@@ -78,92 +80,58 @@ nilはfalseとして扱われる
 puts "面積は#{area}です"
 ```
 
-### クラスの定義
-
-```ruby
-■クラスの定義
-# Menuクラスを移動したら、menu.rbを読み込んでください
-class Menu
-  attr_accessor :name
-  attr_accessor :price
-  
-  def initialize(name:, price:)
-    self.name = name
-    self.price = price
-  end
-  
-  def info
-    return "#{self.name} #{self.price}円"
-  end
-  
-  def get_total_price(count)
-    total_price = self.price * count
-    if count >= 3
-      total_price -= 100
-    end
-    return total_price
-  end
-end
-```
-
-### 継承とオーバーライド
-同名メソッド作るだけ。
-
-```ruby
-使用する側で以下
-require "./menu"
-menu1 = Menu.new(name: "ピザ", price: 800)
-
-継承
-require "./menu"
-class Food <  Menu
-end
-```
-
-### Superクラスのメソッド呼び出し
-
-親クラスと引数が同じ場合、
-子クラスで引数無しの「super」実行時は、自分に渡された引数を親クラス渡す。
-子クラスで親クラスと同じプロパティへの代入処理を実装しなくて済む。
-そもそも子クラスで独自のinitializeが不要なら、実装しなければ親クラスのinitializeが実行される。
-
-### セッターメソッドの定義方法
-
-「name=」という名前のメソッドを定義
-単純な処理ではattr_accessorを使用すれば良い。
-
-```ruby
-def name=(name)
-  @name = name
-end
-
-#使用する側
-#内部的にはobj.name=("山田太郎")というメソッド呼び出し
-obj.name = "山田太郎"
-```
-
-### クラスメソッド
-
-インスタンスからは呼び出せないメソッド
-self.をつける
-
-```ruby
-class Person
-  def self.adulthood_age_text
-    "成人年齢は18才です"
-  end
-end
-
-#呼び出し
-puts Person.adulthood_age_text
-```
-
 ### privateメソッド
 クラスの内部からのみ呼び出すことができるメソッド
 
 ```ruby
 private  # この行以降のメソッドはプライベートになる
 ```
+
+### protectedメソッド
+
+外部には公開したくないが、同じクラスやサブクラスの中であればレシーバ付きで呼び出せるようにする。
+つまりは、他のインスタンスのprotectedメソッドを呼び出せるということ。
+privateメソッドは他のインスタンスは呼び出せない。
+レシーバ付きっていうのは、「other_user.weight」の部分インスタンス.メソッドのこと。
+インスタンス同士で呼び出しが可能ということ。
+
+```ruby
+class User
+
+  attr_reader :name
+
+  def initialize(name, weight)
+    @name = name
+    @weight = weight
+  end
+
+  def heavier_than?(other_user)
+    other_user.weight < @weight
+  end
+
+  protected
+
+  #protectedは同じクラスかサブクラスであればレシーバ付きで呼び出せる
+  def weight
+    @weight
+  end
+end
+
+alice = User.new("Alice", 50)
+bob = User.new("Bob", 60)
+
+#同じクラスのインスタンスメソッド内であればweightが呼び出せる
+puts alice.heavier_than?(bob)
+puts bob.heavier_than?(alice)
+
+#クラスの外では呼び出せない。
+#alice.weight
+```
+
+### オーバーロード
+
+引数のデータ型や個数の違いに応じて同じ名前のメソッドを複数定義できるオーバーロードはない。
+引数のデフォルト値や可変長引数を使用することで対応する。
 
 ### モジュール
 
