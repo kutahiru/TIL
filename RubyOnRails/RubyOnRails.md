@@ -19,7 +19,22 @@ rails server
 ## 公式ドキュメント
 https://docs.ruby-lang.org/ja/
 
+## 便利
+
+### テーブルのスキーマ確認
+
+Railsコンソールで以下を実行すると、テーブルのスキーマが戻り値なので、確認できる。
+
+```bash
+User.new
+```
+
+
+
+
+
 ## ページ表示の仕組み
+
 ルーティング→コントローラ→ビューの順で処理が行われ、Viewを返す
 ブラウザでURLを入力すると、ルーティングがURLを見て、適切なコントローラのアクションを呼び出す
 コントローラーを経由してViewをブラウザに返している。
@@ -57,8 +72,82 @@ HomeControllerのtopアクションが実行される
 ビューファイル内のERB(埋め込みRuby)が実行され、HTMLが生成される
 生成されたHTMLがブラウザに返される
 
+## ディレクトリ構造
+
+```
+.
+├── app                                # アプリケーションに関わるディレクトリ
+│   ├── assets                         # アセット（画像やスタイルシートetc）に関わるディレクトリ
+│   │   ├── images                     # 画像ファイルに関するディレクトリ
+│   │   └── stylesheets                # スタイルシートに関するディレクトリ
+│   ├── controllers                    # コントローラーに関するディレクトリ
+│   ├── helpers                        # 主にビューの共通処理を定義するヘルパーファイルに関するディレクトリ
+│   ├── javascript                     # JavaScriptに関するディレクトリ
+│   ├── mailers                        # ActionMailerに関するディレクトリ
+│   ├── models                         # モデルに関するディレクトリ
+│   └── views                          # ビューに関するディレクトリ
+│       ├── layouts                    # レイアウトに関するディレクトリ
+│       │   ├── application.html.erb   # ビューに関するレイアウトファイル
+│       │   ├── mailer.html.erb        # HTMLメールのレイアウトファイル
+│       │   └── mailer.text.erb        # TEXTメールのレイアウトファイル
+│       └── ...s                       # XxxxsControllerに対応するビューに関するディレクトリ
+│           ├── _xxxxx.html.erb        # パーシャルテンプレートファイル（他のビューファイルから呼び出されるファイル）
+│           ├── edit.html.erb          # XxxxsControllerのeditアクションに対応するビューファイル
+│           ├── index.html.erb         # XxxxsControllerのindexアクションに対応するビューファイル
+│           ├── new.html.erb           # XxxxsControllerのnewアクションに対応するビューファイル
+│           └── show.html.erb          # XxxxsControllerのshowアクションに対応するビューファイル
+├── config                             # アプリケーションの設定に関するディレクトリ
+│   ├── ... 省略 ...
+│   ├── database.yml                   # データベースに接続するための設定ファイル
+│   ├── environment.rb                 # サーバー起動時の設定ファイル
+│   ├── environments                   # 開発環境毎の設定に関するディレクトリ
+│   │   ├── development.rb             # 開発環境の設定ファイル
+│   │   ├── production.rb              # 本番環境の設定ファイル
+│   │   └── test.rb                    # テスト環境の設定ファイル
+│   ├── initializers                   # アプリケーション起動時の初期設定に関するディレクトリ
+│   ├── locales                        # 多言語対応に関するディレクトリ
+│   └── routes.rb                      # ルーティングに関する設定ファイル
+├── db                                 # データベースに関するディレクトリ
+│   ├── migrate                        # マイグレーションファイルに関するディレクトリ
+│   ├── schema.rb                      # 現状のデータベースに反映されているテーブル構成の写しファイル
+│   └── seeds.rb                       # seedデータに関するファイル
+├── ... 省略 ...
+├── public                             # 静的ファイルに関するディレクトリ
+├── spec                               # RSpec（テスト）に関するディレクトリ
+├── .gitignore                         # .gitignoreの設定ファイル
+├── docker-compose.yml                 # Dockerイメージを組み合わせてコンテナを実行する
+├── Dockerfile                         # Dockerイメージを構築するファイル
+├── Gemfile                            # 必要なGemをリスト化したファイル
+├── Gemfile.lock                       # インストール済みGemのバージョン管理ファイル
+└── README.md                          # プロジェクト概要や環境構築の方法などが書かれたファイル
+```
+
+## 7つのアクション
+
+```
+- index：一覧表示
+- new：新規画面表示
+- create：新しいレコードを作成する
+- edit：編集画面表示
+- show：詳細画面表示
+- update：レコード内容を更新する
+- destroy：レコードを削除する
+```
+
+Railsでは、resources :usersというルーティング定義を行うと、RESTfulな7つのアクションが自動的に生成される。
+
+| HTTPメソッド | パス         | コントローラー#アクション | 用途                     |
+| ------------ | ------------ | ------------------------- | ------------------------ |
+| GET          | /users       | users#index               | ユーザー一覧表示         |
+| GET          | /users/new   | users#new                 | 新規ユーザー作成フォーム |
+| POST         | /users       | users#create              | ユーザー作成処理         |
+| GET          | /users/      | users#show                | 特定ユーザー表示         |
+| GET          | /users//edit | users#edit                | ユーザー編集フォーム     |
+| PATCH/PUT    | /users/      | users#update              | ユーザー更新処理         |
+| DELETE       | /users/      | users#destroy             | ユーザー削除処理         |
 
 ## コントローラーと対応するViewの作成
+
 ```cmd
 rails g controller posts index
 ```
@@ -307,7 +396,7 @@ Postモデル内で定義したインスタンスメソッドは
 
 ## Gemのインストール
 Gemfile
-gem 'gemの名前'
+gem 'gemの名前' 
 
 ```cmd
 bundle install
@@ -355,3 +444,8 @@ def self.has_secure_password(options = {})
   # その他の設定...
 end
 ```
+
+## Bundlerとは
+
+Bundler（バンドラー）は、依存関係管理ツール
+Gemパッケージのバージョン管理や依存関係の解決を効率的に行うためのツール

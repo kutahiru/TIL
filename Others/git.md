@@ -76,7 +76,48 @@ git merge ブランチ名
 git log
 ```
 
+ステージングへの追加をリセット
+
+```bash
+git reset
+```
+
+
+
 ## 考え方
 
 あるディレクトリに対して、紐づくブランチを切り替えて使用する。
+
+## 開発の流れ
+
+### 新しいブランチを切り、チェックアウト
+
+```bash
+git checkout master
+git branch  #(masterに*が付いていることを確認してください)
+git pull origin master   #（リモートリポジトリの最新の変更を現在のブランチに統合します）
+git checkout -b feature/01_add_runteq_to_welcome   （#feature/01_add_runteq_to_welcomeというブランチを作成＆移動します）
+git branch   (feature/01_add_runteq_to_welcomeに*が付いていることを確認してください)
+```
+
+### 修正を実施して、コミット
+
+```bash
+git branch
+git status
+git add (ファイル名)
+
+git status  （＊）
+
+git commit -m xxxxx （xxxxxには適切なコミットメッセージを入力してください）
+git push origin 01_basic_settings
+```
+
+### プルリクエストがマージされた後は、masterブランチに最新を取得
+
+```bash
+git checkout master
+git branch
+git pull origin master
+```
 
