@@ -39,7 +39,8 @@ git status
 変更をコミットする前に、どの変更を次のコミットに含めるかを選択
 
 ```bash
-git add -A
+git add -A #実行場所に関わらずリポジトリ全体
+git add . #カレントディレクトリ以下
 ```
 
 ステージングエリアに追加されたファイルをメッセージを設定してコミットする。
@@ -82,7 +83,13 @@ git log
 git reset
 ```
 
+作業フォルダの変更を取り消し
 
+```bash
+git checkout -- app/controllers/top_controller.rb #特定のファイル
+git checkout -- app/controllers/ #特定のディレクトリ
+git checkout -- . #全ての変更
+```
 
 ## 考え方
 
@@ -109,7 +116,7 @@ git add (ファイル名)
 
 git status  （＊）
 
-git commit -m xxxxx （xxxxxには適切なコミットメッセージを入力してください）
+git commit -m xxxxx （「-m」はメッセージ）
 git push origin 01_basic_settings
 ```
 
@@ -121,3 +128,4 @@ git branch
 git pull origin master
 ```
 
+![image-20250418083213378](C:\Users\kota\AppData\Roaming\Typora\typora-user-images\image-20250418083213378.png)

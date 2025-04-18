@@ -1,3 +1,5 @@
+
+
 # Ruby on Rails
 
 ## 疑問
@@ -26,12 +28,15 @@ https://docs.ruby-lang.org/ja/
 Railsコンソールで以下を実行すると、テーブルのスキーマが戻り値なので、確認できる。
 
 ```bash
-User.new
+User.attribute_names
+User.new #これより上のが良さそう
 ```
 
+## Railsコンソール
 
-
-
+```
+docker compose exec web bin/rails console
+```
 
 ## ページ表示の仕組み
 
@@ -389,7 +394,30 @@ def ensure_correct_user
 end
 ```
 
+## StrongParameter
+
+ユーザーから送信されるParameterのうち、開発者が事前に定義したもののみをデータベースに保存する
+```ruby
+private
+
+def user_params
+  params.require(:キー(モデル名)).permit(:カラム名１,：カラム名２,・・・).merge(カラム名: 入力データ)
+end
+```
+
+## パーシャル
+
+ビュー画面を共通化するために使用
+呼び出しは「render ファイル名（ディレクトリを指定）」
+引数はパーシャル内でローカル変数として参照可能
+
+```erb
+<%= render 'layouts/product' %> #引数なし
+<%= render partial: "product", locals: { my_product: @product } %> #引数あり
+```
+
 ## コントローラで使用する処理をモデルにメソッドで用意する
+
 Railsではモデル内にインスタンスメソッドを定義することができる。
 Postモデル内で定義したインスタンスメソッドは
 コントローラーでpostインスタンスに対して用いることができる。
