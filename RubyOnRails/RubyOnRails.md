@@ -32,7 +32,7 @@ User.attribute_names
 User.new #これより上のが良さそう
 ```
 
-## Railsコンソール
+## Railsコンソールの起動
 
 ```
 docker compose exec web bin/rails console
@@ -139,44 +139,12 @@ HomeControllerのtopアクションが実行される
 - destroy：レコードを削除する
 ```
 
-Railsでは、resources :usersというルーティング定義を行うと、RESTfulな7つのアクションが自動的に生成される。
-
-| HTTPメソッド | パス         | コントローラー#アクション | 用途                     |
-| ------------ | ------------ | ------------------------- | ------------------------ |
-| GET          | /users       | users#index               | ユーザー一覧表示         |
-| GET          | /users/new   | users#new                 | 新規ユーザー作成フォーム |
-| POST         | /users       | users#create              | ユーザー作成処理         |
-| GET          | /users/      | users#show                | 特定ユーザー表示         |
-| GET          | /users//edit | users#edit                | ユーザー編集フォーム     |
-| PATCH/PUT    | /users/      | users#update              | ユーザー更新処理         |
-| DELETE       | /users/      | users#destroy             | ユーザー削除処理         |
-
-## コントローラーと対応するViewの作成
+## コントローラーの作成
 
 ```cmd
-rails g controller posts index
+rails g controller posts #コントローラーだけ作成する場合
+rails g controller posts index #対応するルーティング、Viewも作成される
 ```
-- ルーティングが追加される。
-```rb
-#config/routes.rb
-get "posts/index" => "posts#index"
-```
-
-- indexアクションを持つpostsコントローラーが作成される。
-```rb
-#app/controllers/posts_controller.rb
-class PostsController < ApplicationController
-  def index
-  end
-end
-```
-
-- ビューファイルが作成される。
-  app/views/posts/index.html.erb
-
-- CSSが作成される。
-  app/assets/stylesheets/posts.scss
-
 
 ## DBにテーブル作成
 ```cmd
