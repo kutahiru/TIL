@@ -32,11 +32,9 @@ User.attribute_names
 User.new #これより上のが良さそう
 ```
 
-## Railsコンソールの起動
+### ルーティングを一覧で確認
 
-```
-docker compose exec web bin/rails console
-```
+http://localhost:3000/rails/info/routes
 
 ## ページ表示の仕組み
 
@@ -48,10 +46,11 @@ docker compose exec web bin/rails console
 
 ルーティングは、送信されたURLに対して「どのコントローラの、どのアクション」で
 処理するかを決める「対応表」のこと
+
 ```rb
 #config/routes.rb
 Rails.application.routes.draw do
-  get "home/top" => "home#top"
+  get "home/top", to: "home#top"
 end
 ```
 
@@ -127,61 +126,6 @@ HomeControllerのtopアクションが実行される
 └── README.md                          # プロジェクト概要や環境構築の方法などが書かれたファイル
 ```
 
-## 7つのアクション
-
-```
-- index：一覧表示
-- new：新規画面表示
-- create：新しいレコードを作成する
-- edit：編集画面表示
-- show：詳細画面表示
-- update：レコード内容を更新する
-- destroy：レコードを削除する
-```
-
-## コントローラーの作成
-
-```cmd
-rails g controller posts #コントローラーだけ作成する場合
-rails g controller posts index #対応するルーティング、Viewも作成される
-```
-
-## DBにテーブル作成
-```cmd
-rails g model User name:string email:string
-rails db:migrate
-```
-
-DB操作に使用するモデルも生成される。
-app/models/User.rb
- ※ApplicationRecordを継承している。
-
-INSERT時はモデルのインスタンスを作成後、Save;
-
-- DBからの取得処理
-  indexメソッド内に以下のように取得処理を記載できる。
-  @posts = Post.all
-
-### 既存テーブルの定義変更
-1. マイグレーションファイルを作成する  
-db/migrateフォルダに、作成日時_add_image_name_to_usersでファイルが作成される。
-```cmd
-  rails g migration add_image_name_to_users
-```
-
-2. マイグレーションファイルを編集する
-```rb
-  def change
-    add_column(:users, :image_name, :string)
-    remove_column(:users, :password, :string)
-  end
-```
-
-3. 実行する
-```cmd
-  rails db:migrate
-```
-
 ## シンボルについて
 - シンボルはRubyの特殊なデータ型で、名前の前にコロンを付けて表します。
 シンボルはRubyでは不変のオブジェクトで、同じシンボルは常に同じオブジェクトIDを持つ
@@ -236,15 +180,6 @@ form_tagが生成したHTML（開始フォームタグ）を出力するため�
 理由があれば相対パスを使用する。
 post/index
 
-## link_toでHTMLを表示したい場合
-第一引数ではなく、以下のように記載する必要がある。
-
-```rb
-<%= link_to("/likes/#{@post.id}/destroy", {method: "post"}) do %>
-  <span class="fa fa-heart liked-btn"></span>
-<% end %>   
-```
-
 ## getとpostの使い分け
 - post
   データベースを変更する場合
@@ -252,29 +187,9 @@ post/index
 
 ・link_toの仕様
 　link_toの第三引数に「{method: "post"}」を設定しないとgetを参照してしまう。
+
 ```rb
 　<%= link_to("削除", "/posts/#{@post.id}/edit", {method: "post"}) %>
-```
-
-## バリデーションはモデルで設定する
-```rb
-validates(:content, {presence: true})
-validates(:content, {presence: true, length: {maximum: 140}})
-```
-
-validates メソッドは、指定された属性（フィールド）に対して、様々な検証ルールを適用するためのメタプログラミング的な仕組み
-検証の度にモデルが実行されているわけではなく、
-バリデーターのインスタンスを作成して登録する処理と思えば良い。
-モデルのライフサイクル（保存時など）で実際の検証が実行される。
-
-## バリデーションエラー
-saveメソッドを呼び出した際にバリデーションに失敗すると、
-Railsでは自動的にエラーメッセージが生成されるようになっています。
-@post.errors.full_messagesの中に、エラー内容が配列で入ります。
-
-```rb
-@post.erros.full_messages do |message|
-<%= message %>
 ```
 
 ## 確定後に表示するメッセージなど
@@ -317,17 +232,6 @@ top.html.erbなどの各ビューファイルは、この<%= yield %>の部分�
 application.html.erbの一部としてブラウザに表示されていました。
 この仕組みによって、ヘッダーなどの共通のレイアウトを1つにまとめることができます。
 
-## 全アクションで共通する処理
-全てのコントローラで共通する処理はapplicationコントローラにまとめる
-
-```rb
-before_action :set_current_user
-
-def set_current_user
-  @current_user = User.find_by(id: session[:user_id])
-end
-```
-
 ## ログインしていない場合のアクセス制限
 onlyを用いて各コントローラでbefore_actionを使うことで、指定したアクションでのみそのメソッドを実行することができる
 条件に合致する場合にログインページにリダイレクトすることでアクセス制限となる。
@@ -360,28 +264,6 @@ def ensure_correct_user
     redirect_to("/posts/index")
   end
 end
-```
-
-## StrongParameter
-
-ユーザーから送信されるParameterのうち、開発者が事前に定義したもののみをデータベースに保存する
-```ruby
-private
-
-def user_params
-  params.require(:キー(モデル名)).permit(:カラム名１,：カラム名２,・・・).merge(カラム名: 入力データ)
-end
-```
-
-## パーシャル
-
-ビュー画面を共通化するために使用
-呼び出しは「render ファイル名（ディレクトリを指定）」
-引数はパーシャル内でローカル変数として参照可能
-
-```erb
-<%= render 'layouts/product' %> #引数なし
-<%= render partial: "product", locals: { my_product: @product } %> #引数あり
 ```
 
 ## コントローラで使用する処理をモデルにメソッドで用意する
