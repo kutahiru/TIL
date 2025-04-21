@@ -91,6 +91,32 @@ git checkout -- app/controllers/ #特定のディレクトリ
 git checkout -- . #全ての変更
 ```
 
+変更分の一時退避
+
+```bash
+git stash save "一時退避"
+git stash list #リストを確認
+git stash apply 復旧したいstash名
+git stash drop 削除したいstash名
+```
+
+## バージョン管理外にしたいファイル
+
+.gitignoreに記載する。
+
+```
+# 指定したファイルを除外
+index.html
+# ルートディレクトリを指定
+/root.html
+# ディレクトリ以下を除外
+dir/
+# /以外の文字列にマッチ「*」
+/*/*.css
+```
+
+
+
 ## 考え方
 
 あるディレクトリに対して、紐づくブランチを切り替えて使用する。

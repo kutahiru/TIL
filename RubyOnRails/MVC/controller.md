@@ -14,7 +14,7 @@ end
 
 全てのコントローラで共通する処理はapplicationコントローラにまとめる
 
-```rb
+```ruby
 before_action :set_current_user
 
 def set_current_user
@@ -22,7 +22,7 @@ def set_current_user
 end
 ```
 
-### フック
+### フィルタ(フック)
 
 アクションの前後に処理を実施することができる。
 アクションそれぞれで同じ実装をする必要がない。
@@ -66,4 +66,3 @@ def user_params
 end
 ```
 
-## 

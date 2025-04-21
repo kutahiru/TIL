@@ -8,9 +8,38 @@
 ファイル名は_で始める。
 
 ```erb
-<%= render user %> #引数なし
-<%= render partial: "product", locals: { my_product: @product } %> #引数あり
+#index.html.erb
+<div id="users">
+  <% @users.each do |user| %>
+    <%= render user %>
+    <p>
+      <%= link_to "Show this user", user %>
+    </p>
+  <% end %>
+</div>
+
+#「render user」は以下の省略形
+<%= render partial: "users/user", locals: { user: user } %>
+
+#「render "form", user: @user」は以下の省略形
+<%= render partial: "form", locals: { user: @user } %>
 ```
+
+```erb
+#_user.html.erb
+<div id="<%= dom_id user %>">
+  <p>
+    <strong>名前:</strong>
+    <%= user.name %>
+  </p>
+</div>
+```
+
+「render user」ではRailsは自動的に以下のことを行っている。
+
+1. ユーザーオブジェクトの種類（モデル名）を判断する
+2. そのモデル名に基づいて適切なパーシャルを探す（通常は`_user.html.erb`というファイル）
+3. そのパーシャルにユーザーオブジェクトを渡してレンダリングする
 
 ### link_to
 
@@ -30,21 +59,33 @@ link_to("profile link", edit_profile_path)
 <% end %>   
 ```
 
-## form_with
+### render
+
+現在のリクエスト内でビューをレンダリング（描画）する処理
+相対パスを設定する。
+処理の失敗時はこっち
+
+### redirect_to
+
+別のURLにリダイレクト（転送）する」処理
+絶対パスを設定する。
+処理の成功時はこっち
+
+### form_with
 
 フォームを構築するためのヘルパーメソッド
 モデルの情報を元に送信URLやフィールドの内容を埋めたりすることができる。
 https://railsguides.jp/form_helpers.html
 
-### シンプルなフォーム
+#### シンプルなフォーム
 
 ```erb
 <%= form_with do |form| %>
-  Form contents
+  <!-- Form contents ->
 <% end %>
 ```
 
-### フォームに設定可能なヘルパーメソッド
+#### フォームに設定可能なヘルパーメソッド
 
 「テキストフィールド」「チェックボックス」「ラジオボタン」などのこと。
 これらのメソッドの第1引数は、常に入力の名前。
@@ -60,7 +101,7 @@ https://railsguides.jp/form_helpers.html
 params[:query]
 ```
 
-### モデルオブジェクトを指定したフォーム
+#### モデルオブジェクトを指定したフォーム
 
 :modelオプションを使うと、フォームビルダーオブジェクトをモデルオブジェクトに紐付けできるようになる
 モデルオブジェクトの値がフォームのフィールドに自動入力されるv
@@ -89,4 +130,8 @@ params[:query]
 
 #コントローラでアクセスする際はStrongParametersを使用する
 ```
+
+
+
+
 
