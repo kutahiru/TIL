@@ -84,3 +84,28 @@ class AddPriceToArticles < ActiveRecord::Migration[7.2]
 end
 ```
 
+## MySQLに接続する
+
+### コンテナ内部に入る場合
+
+```bash
+docker compose exec サービス名 bash
+```
+
+### コマンド
+
+```bash
+mysql -u root -p #ログイン
+show databases; #DB一覧
+create database DB名; #DB作成
+use runteq_study; #DBに移動する
+show tables; #テーブル確認
+
+#テーブル作成
+CREATE TABLE user(
+    id INT(11) AUTO_INCREMENT NOT NULL,
+    first_name VARCHAR(30) NOT NULL,
+    last_name VARCHAR(30) NOT NULL,
+    PRIMARY KEY (id));
+```
+

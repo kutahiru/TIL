@@ -20,6 +20,14 @@ rails routes
 rails routes　-c comments #コントローラの指定
 ```
 
+### テーブル定義の一覧確認
+
+```bash
+#rails console
+ActiveRecord::Base.connection.tables
+ActiveRecord::Base.connection.execute("SELECT * FROM admin_users WHERE id = 2").to_a
+```
+
 
 
 ### DB

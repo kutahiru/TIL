@@ -32,10 +32,6 @@ User.attribute_names
 User.new #これより上のが良さそう
 ```
 
-### ルーティングを一覧で確認
-
-http://localhost:3000/rails/info/routes
-
 ## ページ表示の仕組み
 
 ルーティング→コントローラ→ビューの順で処理が行われ、Viewを返す
