@@ -44,6 +44,8 @@ db:migrate:status RAILS_ENV=test
 
 ```bash
 rails g migration Xxxxx 
+#db/migrateディレクトリ配下に、データベースのテーブル構造を定義するマイグレーションファイルも生成
+#モデルは追加しないので、主に定義変更時に使用する
 ```
 
 ### 列追加のマイグレーションファイル作成
@@ -56,6 +58,14 @@ rails g migration AddTelToUsers tel:string
 
 ```bash
 rails db:migrate
+```
+
+### 新しいモデルとマイグレーションファイルを作成
+
+```bash
+rails g model
+#app/modelsディレクトリに〇〇.rbというファイルが生成
+#db/migrateディレクトリ配下に、データベースのテーブル構造を定義するマイグレーションファイルも生成
 ```
 
 ## マイグレーションファイル

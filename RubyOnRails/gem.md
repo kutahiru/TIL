@@ -7,3 +7,7 @@
 ## pry-byebug
 
 デバッグ実行が可能になる
+
+## Rubocop
+
+RubyのLintチェックをする時によく使用されるツール

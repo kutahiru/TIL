@@ -366,7 +366,59 @@ map等のメソッドで利用可能。また、初期値を指定可能
 fruits.map.with_index(2) { |fruit, i| puts "#{i}: #{fruit}" }
 ```
 
+#### sort_by
+
+`sort`と`sort_by`メソッドの違いを理解することは、Rubyでのソート操作において重要です。基本的に、`sort`メソッドはシンプルな配列のソートに適していますが、`sort_by`メソッドはより複雑なデータ構造のソートや、複数の条件に基づくソートに適しています。
+
+```ruby
+# 2次元配列をsort_byでソートするサンプル
+array = [[3, 5], [1, 2], [4, 1], [2, 3]]
+
+# 第1要素でソート
+sorted_by_first = array.sort_by { |element| element[0] }
+puts "第1要素でソート:"
+p sorted_by_first  # [[1, 2], [2, 3], [3, 5], [4, 1]]
+
+# 第2要素でソート
+sorted_by_second = array.sort_by { |element| element[1] }
+puts "第2要素でソート:"
+p sorted_by_second  # [[4, 1], [1, 2], [2, 3], [3, 5]]
+
+# 複数の条件でソート（第1要素で昇順、第2要素で昇順）
+sorted_by_multiple = array.sort_by { |element| [element[0], element[1]] }
+puts "複数条件でソート（昇順、昇順）:"
+p sorted_by_multiple  # [[1, 2], [2, 3], [3, 5], [4, 1]]
+
+# 複数の条件でソート（第1要素で昇順、第2要素で降順）
+sorted_by_mixed = array.sort_by { |element| [element[0], -element[1]] }
+puts "複数条件でソート（昇順、降順）:"
+p sorted_by_mixed  # [[1, 2], [2, 3], [3, 5], [4, 1]]
+```
+
+#### sort
+
+```ruby
+# 2次元配列をsortでソートするサンプル
+array = [[3, 5], [1, 2], [4, 1], [2, 3]]
+
+# 第1要素でソート
+sorted_by_first = array.sort { |a, b| a[0] <=> b[0] }
+puts "第1要素でソート:"
+p sorted_by_first  # [[1, 2], [2, 3], [3, 5], [4, 1]]
+
+# 第2要素でソート
+sorted_by_second = array.sort { |a, b| a[1] <=> b[1] }
+puts "第2要素でソート:"
+p sorted_by_second  # [[4, 1], [1, 2], [2, 3], [3, 5]]
+
+# 第1要素で昇順、第1要素が同じ場合は第2要素で降順
+sorted_complex = array.sort { |a, b| a[0] == b[0] ? b[1] <=> a[1] : a[0] <=> b[0] }
+puts "複合条件でソート:"
+p sorted_complex  # [[1, 2], [2, 3], [3, 5], [4, 1]]
+```
+
 #### ハッシュのeach
+
 ハッシュなので、ブロックパラメータが二つになる。
 ```ruby
 currencies = {japan: "yen", us: "dollar", india: "rupee"}

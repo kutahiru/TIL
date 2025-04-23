@@ -76,3 +76,56 @@ addEventListnerメソッドの第1引数にはイベント名、第2引数には
 ## クライアントサイドWebAPI
 ブラウザ内で動作するJavaScriptを使ってWebページにインタラクティブな機能を追加するためのAPI
 https://developer.mozilla.org/ja/docs/Web/API
+
+## API利用サンプル
+
+```javascript
+window.addEventListener('load', () => {
+  const button = document.querySelector("button")
+  const repositorySpace = document.querySelector("#repository_list")
+  button.addEventListener('click', () => {
+    const githubName = document.querySelector("#github_name").value
+    fetch(`https://api.github.com/users/${githubName}/repos`)
+    .then((response) => response.json())
+    .then((data) => {
+      //for文を使ってdataの配列の要素をrepositoryInfoという変数に一回一回格納する
+      for(repositoryInfo of data){
+        const li = document.createElement("li")
+
+        li.innerHTML = repositoryInfo["name"]
+        //リポジトリの名前の取得を確認
+        repositorySpace.appendChild(li)
+      }
+    });
+  })
+})
+```
+
+## Promiseについて
+
+Promiseはresolve()やreject()という決まった関数が実行されてから、次の処理を動かす仕組み
+async/awaitを使った方法でも同じような処理をわかりやすいコードで記載することができる
+
+```js
+new Promise((resolve, reject) => {
+  // 非同期で処理したいことを記述
+  // 成功したらresolve()を呼ぶ
+  resolve()
+  // 失敗したらreject()を呼ぶ
+  reject()
+}).then(() => {
+  // 上のresolve()が実行された後の処理
+  })
+  .catch(() => {
+  // 上のreject()が実行された後の処理
+  })
+
+new Promise((resolve, reject) => {
+  resolve()
+}).then(() => {
+    console.log("resolveが実行されてthenの処理が動きました")
+  })
+  .catch(() => {
+    console.log("rejectが実行されてcatchの処理が動きました")
+  })
+```

@@ -28,11 +28,15 @@ ActiveRecord::Base.connection.tables
 ActiveRecord::Base.connection.execute("SELECT * FROM admin_users WHERE id = 2").to_a
 ```
 
-
-
 ### DB
 
 DB.mdのほうに記載
+
+### RubocopによるLintチェックのコマンド
+
+```bash
+bundle exec rubocop
+```
 
 
 
