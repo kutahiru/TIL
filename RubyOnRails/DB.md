@@ -99,17 +99,20 @@ end
 ### コンテナ内部に入る場合
 
 ```bash
+#サービス名はdocker-compose.ymlに記載がある。
 docker compose exec サービス名 bash
 ```
 
 ### コマンド
 
 ```bash
+#パスワードはdocker-compose.ymlに記載がある。
 mysql -u root -p #ログイン
 show databases; #DB一覧
 create database DB名; #DB作成
 use runteq_study; #DBに移動する
 show tables; #テーブル確認
+SHOW CREATE TABLE users; #テーブルの詳細確認
 
 #テーブル作成
 CREATE TABLE user(

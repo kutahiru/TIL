@@ -104,11 +104,11 @@ params[:query]
 #### モデルオブジェクトを指定したフォーム
 
 :modelオプションを使うと、フォームビルダーオブジェクトをモデルオブジェクトに紐付けできるようになる
-モデルオブジェクトの値がフォームのフィールドに自動入力されるv
+モデルオブジェクトの値がフォームのフィールドに自動入力される
 
-- フォームの`action`属性には適切な値`action="/books"`が自動的に入力されます。書籍を更新する場合は`action="/books/42"`のようになります。
-- フォームのフィールド名は`book[...]`でスコープ化されます。つまり、`params[:book]`はこれらのフィールドの値をすべて含むハッシュになります。
-- 送信ボタンには、適切なテキスト値（この場合は「Create Book」）が自動的に入力されます。
+Railsはそのモデルの状態（新規または既存）に基づいて適切なリクエスト先（アクション）とHTTPメソッド（POSTまたはPATCH/PUT）を自動で選択
+
+@userが新規オブジェクトの場合、フォームは users#create へのPOSTリクエストを行いますが、既存データの編集の場合は users#update へのPATCH/PUTリクエスト
 
 ```ruby
 @book = Book.find(42)
@@ -131,7 +131,75 @@ params[:query]
 #コントローラでアクセスする際はStrongParametersを使用する
 ```
 
+```erb
+#sample
+<div class="container">
+  <div class="row">
+    <div class="col-md-10 col-lg-8 mx-auto">
+      <h1>ユーザー登録</h1>
+      <%= form_with model: @user do |f| %>
+        <div class="mb-3">
+          <%= f.label :last_name, class: "form-label" %>
+          <%= f.text_field :last_name, class: "form-control" %>
+        </div>
+        <div class="mb-3">
+          <%= f.label :first_name, class: "form-label" %>
+          <%= f.text_field :first_name, class: "form-control" %>
+        </div>
+        <div class="mb-3">
+          <%= f.label :email, class: "form-label" %>
+          <%= f.email_field :email, class: "form-control" %>
+        </div>
+        <div class="mb-3">
+          <%= f.label :password, class: "form-label" %>
+          <%= f.password_field :password, class: "form-control" %>
+        </div>
+        <div class="mb-3">
+          <%= f.label :password_confirmation, class: "form-label" %>
+          <%= f.password_field :password_confirmation, class: "form-control" %>
+        </div>
+        <%= f.submit "登録", class: "btn btn-primary" %>
+      <% end %>
+      <div class='text-center'>
+        <%= link_to 'ログインページへ', login_path %>
+      </div>
+    </div>
+  </div>
+</div>
+```
 
+#### モデルを指定しないフォーム
+
+URLを直接指定する方法は、特定のアクションにフォームデータを送信する場合
+f.email_field :emailについて、
+form_withヘルパーメソッドの中で使われるemail_fieldメソッド
+「<input type="email">」を生成する
+`:email` という名前（name属性）でフォームデータを送信する
+
+```erb
+<div class="container">
+  <div class="row">
+    <div class=" col-md-10 col-lg-8 mx-auto">
+      <h1>ログイン</h1>
+      <%= form_with url: login_path do |f| %>
+        <div class="mb-3">
+          <%= f.label :email %>
+          <%= f.email_field :email, class: "form-control" %>
+        </div>
+        <div class="mb-3">
+          <%= f.label :password %>
+          <%= f.password_field :password, class: "form-control" %>
+        </div>
+        <%= f.submit "ログイン", class: "btn btn-primary" %>
+      <% end %>
+      <div class='text-center'>
+        <%= link_to '登録ページへ', new_user_path %>
+        <%= link_to 'パスワードをお忘れの方はこちら', '#' %>
+      </div>
+    </div>
+  </div>
+</div>
+```
 
 
 
