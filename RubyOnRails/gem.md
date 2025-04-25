@@ -1,5 +1,9 @@
 # gem
 
+```
+docker compose run web bundle install
+```
+
 ## better_errors
 
 デフォルトのエラー画面をわかりやすく整形してくれる
@@ -15,8 +19,6 @@ RubyのLintチェックをする時によく使用されるツール
 #チェックの実行
 docker compose exec web bundle exec rubocop
 ```
-
-
 
 ## sorcery
 
@@ -81,5 +83,33 @@ class UserSessionsController < ApplicationController
     redirect_to root_path, status: :see_other
   end
 end
+```
+
+## rails-i18n
+
+ローカライズ
+```ruby
+#config/application.rb
+config.i18n.default_locale = :ja
+
+#Gemfile
+gem 'rails-i18n', '~> 7.0.0'
+
+#config/locales/activerecord/ja.yml
+#モデルに関する日本語
+
+#config/locales/views/ja.yml
+#ビューに関する日本語
+```
+
+翻訳対象
+
+```ruby
+<%= link_to t('header.profile'), '#', class: 'dropdown-item' %>
+
+#app/views/user_sessions/new.html.erb
+#ja/user_sessions/new配下にある日本語を取得
+#tメソッドの引数が . から始まる場合、相対キー
+<h1><%= t('.title') %></h1>
 ```
 
