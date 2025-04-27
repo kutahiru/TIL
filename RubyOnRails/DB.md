@@ -34,6 +34,12 @@ rails db:rollback
 rails db:migrate:status
 ```
 
+### 適用前に戻す場合
+
+```bash
+rails db:rollback STEP=1 #1つ前のマイグレーションに戻す
+```
+
 ### テスト環境にコマンドを適用
 
 ```bash
@@ -63,7 +69,7 @@ rails db:migrate
 ### 新しいモデルとマイグレーションファイルを作成
 
 ```bash
-rails g model
+rails g model モデル名
 #app/modelsディレクトリに〇〇.rbというファイルが生成
 #db/migrateディレクトリ配下に、データベースのテーブル構造を定義するマイグレーションファイルも生成
 ```
@@ -73,11 +79,14 @@ rails g model
 ### create_table
 
 ```ruby
-class CreateArticles < ActiveRecord::Migration[7.2]
+class CreateBoards < ActiveRecord::Migration[7.0]
   def change
-    create_table :articles do |t|
-      t.string :title, null: false, default: '記事のタイトル'
-      t.text :body
+    create_table :boards do |t|
+      t.string :title, null: false
+      t.text :body, null: false
+      #referencesは外部キー設定用のメソッド、列名はモデル名_id
+      t.references :user, foreign_key: true
+
       t.timestamps
     end
   end
@@ -120,5 +129,32 @@ CREATE TABLE user(
     first_name VARCHAR(30) NOT NULL,
     last_name VARCHAR(30) NOT NULL,
     PRIMARY KEY (id));
+```
+
+## 開発環境の初期データ
+
+db/seeds.rb
+
+```ruby
+10.times do
+  User.create!(last_name: Faker::Name.last_name,
+              first_name: Faker::Name.first_name,
+              email: Faker::Internet.unique.email,
+              password: "password",
+              password_confirmation: "password")
+end
+
+user_ids = User.ids
+
+20.times do |index|
+  user = User.find(user_ids.sample)
+  user.boards.create!(title: "タイトル#{index}", body: "本文#{index}")
+end
+```
+
+### 適用コマンド
+
+```bash
+rails db:seed
 ```
 

@@ -66,3 +66,9 @@ def user_params
 end
 ```
 
+### 関連テーブルの取得
+
+```ruby
+@boards = Board.includes(:user) #関連するテーブルをまとめてDBから取得できる
+```
+

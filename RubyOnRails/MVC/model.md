@@ -63,7 +63,7 @@ adult_users_count = User.where("age >= ?", 18).count
 validates(:content, {presence: true})
 validates(:content, {presence: true, length: {maximum: 140}})
 numericality #数値
-
+uniqueness: true #重複チェック
 ```
 
 validatesメソッドは可変長引数、第2引数以降はハッシュ形式の検証オプション
@@ -73,6 +73,8 @@ validatesメソッドは可変長引数、第2引数以降はハッシュ形式�
 
 ### バリデーションエラー
 
+エラー表示ロジックは共通処理のviewに記載するのが良い。
+app/views/shared/_error_messages.html.erb
 saveメソッドを呼び出した際にバリデーションに失敗すると、
 Railsでは自動的にエラーメッセージが生成されるようになっています。
 @post.errors.full_messagesの中に、エラー内容が配列で入ります。
@@ -137,14 +139,31 @@ Railsにおけるアソシエーション（Association）は、ActiveRecordモ�
 
 ### アソシエーションの種類
 
-- belongs_to：モデルが他のモデルに従属する場合に使用。例：BookモデルがAuthorに属する。
-- has_one：一方のモデルが他方のモデルを所有する場合に使用。例：SupplierがAccountを持つ。
-- has_many：モデルが複数の他モデルを所有する場合に使用。例：Authorが複数のBookを持つ。
+- belongs_to：
+  1つのモデルが他のモデルに属する場合に使用します。例えば、掲示板がユーザーに属する場合、Boardモデルに対してUserモデルを belongs_to :user と定義します。これにより、Boardモデルのインスタンスから投稿者であるユーザー情報を簡単に取得できます。
+- has_one：
+  1つのモデルが他のモデルと1対1で関連付けられる場合に使用します。例えば、ユーザーが1つのプロフィールを持つ場合、Userモデルに対してProfileモデルをhas_one :profile と定義します。これにより、Userモデルのインスタンスから関連づいたプロフィール情報を簡単に取得できます。
+- has_many：
+  1つのモデルが複数の他のモデルと関連付けられる場合に使用します。例えば、ユーザーが複数の掲示板を持つ場合、Userモデルに対してBoardモデルを has_many :boards と定義します。これにより、Userモデルのインスタンスからそのユーザーが投稿した複数の掲示板情報を簡単に取得できます。
 - has_many :through：中間モデルを介して多対多の関係を設定。例：Physicianがappointmentsを通じてPatientと関係する。
 - has_one :through：中間モデルを介して一対一の関係を設定。例：SupplierがAccountを通じてAccountHistoryと関係する。
 - has_and_belongs_to_many：中間モデルなしで多対多の関係を設定。例：AssemblyとPartが互いに多対多の関係を持つ。
 
 belongs_toとhas_oneの選択は外部キーの位置によって決まり、has_many :throughとhas_and_belongs_to_manyの選択は中間モデルの必要性によって決まります。
+
+### 定義
+
+```ruby
+class Board < ApplicationRecord
+  ... 省略 ...
+  belongs_to :user
+end
+
+class User < ApplicationRecord
+  ... 省略 ...
+  has_many :boards, dependent: :destroy #destroy 時に関連づけられたモデルに対して destroy が実行される
+end
+```
 
 ### 具体的な利点
 
@@ -164,10 +183,44 @@ belongs_toとhas_oneの選択は外部キーの位置によって決まり、has
   user = User.find(1)
   user.posts #userの投稿一覧
   
-  #関連付け特有の機能を利用可能
-  user.posts.new(title: "新規投稿")  # user_idが自動でセットされる
+  #関連付けの外部キー（user_id）が自動的
+  #newもbuildも機能は同じだが、関連付けコンテキストではbuildを使う
+  user.posts.new(title: "新規投稿")
+  user.posts.build(title: "構築のみ")
+  
+  #即時にデータベースに保存します
   user.posts.create(title: "即保存")  # 作成と同時にuser_idが設定される
-  user.posts.build(title: "構築のみ")  # インスタンス生成のみ
+  
   ```
 
-  
+
+### includesについて
+
+内部的にはpreloadとeager_loadが選択される実行計画とパフォーマンスの比較
+
+- preload
+  - クエリ数: 複数（関連モデルごとに1つ＋親モデル用に1つ）
+  - メモリ使用量: 通常少ない
+  - ネットワーク: 複数回の通信が必要
+  - 適している場合: 関連レコード数が多く、関連テーブルに条件を指定しない場合
+- eager_load
+  - クエリ数: 常に1つ
+  - メモリ使用量: JOINにより大きくなる可能性あり
+  - ネットワーク: 1回の通信
+  - 適している場合: 関連レコード数が少なく、関連テーブルに条件を指定する場合
+
+```sql
+--preloadの場合
+SELECT "users".* FROM "users"
+SELECT "posts".* FROM "posts" WHERE "posts"."user_id" IN (1, 2, 3, ...)
+```
+
+```sql
+--eager_load
+--JOINを使うため、関連テーブルにも条件を指定できる
+SELECT "users"."id" AS t0_r0, "users"."name" AS t0_r1, ..., 
+       "posts"."id" AS t1_r0, "posts"."title" AS t1_r1, ... 
+FROM "users" 
+LEFT OUTER JOIN "posts" ON "posts"."user_id" = "users"."id"
+```
+

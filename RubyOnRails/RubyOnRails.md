@@ -359,3 +359,11 @@ render メソッドは、ビューをレンダリングし、クライアント�
 #BootstrapというCSSフレームワーク
 #alert クラスと、alert-success クラスを使用
 ```
+
+### タイムゾーンを東京に設定する
+
+```
+#config/application.rb
+config.time_zone = 'Tokyo'
+```
+

@@ -41,6 +41,24 @@
 2. そのモデル名に基づいて適切なパーシャルを探す（通常は`_user.html.erb`というファイル）
 3. そのパーシャルにユーザーオブジェクトを渡してレンダリングする
 
+### collectionオプションを使ったrenderメソッドの記述
+
+- collectionの省略記法が使える条件
+  - 部分テンプレートが呼び出し元のテンプレートと同じディレクトリ内にある
+  - 部分テンプレートのファイル名が指定した変数の単数形である
+  - 部分テンプレート内で使用する変数名が、オプションで指定した変数の単数形である
+
+```erb
+<% if @boards.present? %>
+  <%= render @boards %>
+<% else %>
+  <div class="mb-3">掲示板がありません</div>
+<% end %>
+
+#↑の省略前
+<%= render partial: 'board', collection: @boards %>
+```
+
 ### link_to
 
 aタグを生成するヘルパーメソッド
@@ -120,6 +138,8 @@ Railsはそのモデルの状態（新規または既存）に基づいて適切
   <div>
     <%= form.label :title %>
     <%= form.text_field :title %>
+    <%# 上は以下のようなHTMLが作成される%>
+    <%# <input type="text" name="book[title]" id="book_title" value="本のタイトルの現在の値" /> %>
   </div>
   <div>
     <%= form.label :author %>
@@ -202,4 +222,17 @@ form_withヘルパーメソッドの中で使われるemail_fieldメソッド
 ```
 
 
+
+### helperとは
+
+ビューで使用するメソッドを定義するための場所
+app/helpers/application_helper.rb
+
+### content_forメソッド
+
+Railsのビューヘルパーの一つで、ビューテンプレート内で特定の名前付きコンテンツブロックを定義し、そのコンテンツを別の場所（通常はレイアウトファイル）で表示するために使用する。
+
+```erb
+<% content_for(:title, t('.title')) %>
+```
 

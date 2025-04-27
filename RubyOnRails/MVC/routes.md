@@ -62,3 +62,32 @@ resource :login, only: %i[ new create] #特定のアクションのみ作成す�
 | login_path      | PATCH or PUT | /login/     | logins#update             |
 | login_path      | DELETE       | /login/     | logins#destroy            |
 
+### ネストしたルーティング
+
+```ruby
+Rails.application.routes.draw do
+  ... 省略 ...
+  resources :boards, only: %i[index new create show] do
+    resources :comments, only: %i[create edit destroy], shallow: true
+  end
+  ... 省略 ...
+end
+```
+
+### shallow オプションについて
+
+shallowオプションは、ネストしたリソースの一部のアクションに対して、親リソースのIDを含まないURLを生成するために使用する。
+
+- 親リソース（掲示板）のIDが必要なアクション
+
+  collection アクション（index, new, create）には親リソースのID
+  ネストされたURLが生成されます
+  POST /boards/:board_id/comments → コメント作成
+
+- 親リソースのIDが不要なアクション
+
+  member アクション（show, edit, update, destroy）では親リソースのIDを含めない
+  ネストの浅いシンプルなURLが生成されます
+  GET /comments/:id/edit → コメント編集フォーム
+  DELETE /comments/:id → コメント削除
+
