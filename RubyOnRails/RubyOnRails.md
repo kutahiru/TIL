@@ -32,6 +32,17 @@ User.attribute_names
 User.new #これより上のが良さそう
 ```
 
+### URL直接入力された場合の制限
+
+```ruby
+#current_userを使用することで、自身のボード以外の場合編集することはできない。
+def edit
+  @board = current_user.boards.find(params[:id])
+end
+```
+
+
+
 ## ページ表示の仕組み
 
 ルーティング→コントローラ→ビューの順で処理が行われ、Viewを返す

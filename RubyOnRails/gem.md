@@ -267,3 +267,32 @@ hidden_fieldは、フォーム内に非表示のフィールドを生成する�
       <%= image_tag board.board_image_url, class: "card-img-top", width: "300", height:"200" %>
 ```
 
+## turbo-rails
+
+非同期処理
+
+```
+gem 'turbo-rails', '1.1.1'
+```
+
+```erb
+①
+#app\views\boards\_bookmark.html.erb
+<%= link_to bookmarks_path(board_id: board.id), id: "bookmark-button-for-board-#{board.id}", data: { turbo_method: :post } do %>
+  <i class="bi bi-star"></i>
+<% end %>
+```
+
+```erb
+②
+#app\views\bookmarks\create.turbo_stream.erb
+<%= turbo_stream.replace "bookmark-button-for-board-#{@board.id}" do %>
+  <%= render 'boards/unbookmark', board: @board %>
+<% end %>
+```
+
+①では、link_toのオプションに data: { turbo_method: :xxxx } が記述されていることで
+リダイレクトしない際に xxxxx.turbo_stream.erbファイルを探してレスポンスする
+
+②では、turbo_stream.replace の引数に渡されているID属性、unbookmark-button-for-board-xxx
+を探して、対象のDOMをブロック内のものと置き換える

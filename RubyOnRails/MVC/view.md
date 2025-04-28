@@ -69,12 +69,20 @@ link_to("profile link", edit_profile_path)
 
 ### link_toでHTMLを表示したい場合
 
-第一引数ではなく、以下のように記載する必要がある。
+第一引数ではなく、以下のようにブロックで記載する必要がある。
 
 ```erb
 <%= link_to("/likes/#{@post.id}/destroy", {method: "post"}) do %>
   <span class="fa fa-heart liked-btn"></span>
 <% end %>   
+```
+
+### 削除ボタン_アラート付き
+
+```erb
+<%= link_to board_path(board), id: "button-delete-#{board.id}", data: { turbo_method: :delete, turbo_confirm: t('defaults.delete_confirm') } do %>
+  <i class="bi bi-trash-fill"></i>
+<% end %>
 ```
 
 ### render
@@ -232,7 +240,22 @@ app/helpers/application_helper.rb
 
 Railsのビューヘルパーの一つで、ビューテンプレート内で特定の名前付きコンテンツブロックを定義し、そのコンテンツを別の場所（通常はレイアウトファイル）で表示するために使用する。
 
+```ruby
+module ApplicationHelper
+  def page_title(title = '')
+    base_title = 'RUNTEQ BOARD APP'
+    title.present? ? "#{title} | #{base_title}" : base_title
+  end
+end
+```
+
 ```erb
+#application.html.erb
+<title><%= page_title(yield(:title)) %></title>
+```
+
+```erb
+#各viewファイル
 <% content_for(:title, t('.title')) %>
 ```
 

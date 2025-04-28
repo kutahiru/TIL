@@ -91,3 +91,35 @@ shallowオプションは、ネストしたリソースの一部のアクショ�
   GET /comments/:id/edit → コメント編集フォーム
   DELETE /comments/:id → コメント削除
 
+### ネストされているケース
+
+| ヘルパー                 | HTTP verb | パス                     | コントローラー#アクション |
+| ------------------------ | --------- | ------------------------ | ------------------------- |
+| board_comments_path()    | GET       | /boards/:id/comments     | comments#index            |
+| new_board_comment_path() | GET       | /boards/:id/comments/new | comments#new              |
+| board_comments_path()    | POST      | /boards/:id/comments     | comments#create           |
+| comment_path()           | GET       | /comments/:id            | comments#show             |
+| edit_comment_path()      | GET       | /comments/:id/edit       | comments#edit             |
+| comment_path()           | PATCH/PUT | /comments/:id            | comments#update           |
+| comment_path()           | DELETE    | /comments/:id            | comments#destroy          |
+
+### RESTfulなルーティングにアクションを追加する
+
+個々の掲示板（board）に対してプレビューを行いたいとかではなく、
+掲示板全体（boards）の中からブックマークされている掲示板の一覧を表示したいということで、collectionを使って get :bookmarks を記述
+
+```ruby
+resources :boards, only: %i[index new create show edit update destroy] do
+    resources :comments, only: %i[create edit destroy], shallow: true
+    collection do
+      get :bookmarks
+    end
+
+#以下のルーティングが定義される
+#ルーティングヘルパーの命名規則では、コレクションアクションの場合、「アクション名_リソース名_path」という形式
+prefix: bookmarks_boards
+HTTPメソッド: GET
+URLパターン: /boards/bookmarks
+コントローラー#アクション: boards#bookmarks
+```
+

@@ -139,13 +139,47 @@ Railsにおけるアソシエーション（Association）は、ActiveRecordモ�
 
 ### アソシエーションの種類
 
-- belongs_to：
+- belongs_to :単数形
   1つのモデルが他のモデルに属する場合に使用します。例えば、掲示板がユーザーに属する場合、Boardモデルに対してUserモデルを belongs_to :user と定義します。これにより、Boardモデルのインスタンスから投稿者であるユーザー情報を簡単に取得できます。
 - has_one：
   1つのモデルが他のモデルと1対1で関連付けられる場合に使用します。例えば、ユーザーが1つのプロフィールを持つ場合、Userモデルに対してProfileモデルをhas_one :profile と定義します。これにより、Userモデルのインスタンスから関連づいたプロフィール情報を簡単に取得できます。
-- has_many：
+- has_many :複数形
   1つのモデルが複数の他のモデルと関連付けられる場合に使用します。例えば、ユーザーが複数の掲示板を持つ場合、Userモデルに対してBoardモデルを has_many :boards と定義します。これにより、Userモデルのインスタンスからそのユーザーが投稿した複数の掲示板情報を簡単に取得できます。
-- has_many :through：中間モデルを介して多対多の関係を設定。例：Physicianがappointmentsを通じてPatientと関係する。
+- has_many :bookmark_boards, through: :bookmarks, source: :board
+
+  has_many :関連名, through: :中間テーブル名, source: :最終的に参照したいテーブル名の単数形
+  中間モデルを介して多対多の関係を設定。
+  Userが複数のbookmarkを持っていて、各bookmarkはboardに関連付けられている
+  **これはユーザーがブックマークした掲示板を扱いたいために設定している**
+
+  ```ruby
+  class User < ApplicationRecord
+    has_many :bookmarks, dependent: :destroy
+    has_many :bookmark_boards, through: :bookmarks, source: :board
+  end
+  
+  #生成されるメソッド
+  user.bookmark_boards #ユーザーがブックマークした掲示板の一覧
+  ```
+
+  **実装時の考え方**
+
+  Userモデルのhas_many :bookmarksにより、ユーザーからブックマークへのアクセスが可能
+  Bookmarkモデルのbelongs_to :boardにより、ブックマークから掲示板へのアクセスが可能
+  Userモデルのhas_many :bookmark_boards, through: :bookmarks, source: :boardにより、上記2つの関連付けを組み合わせて、ユーザーから直接掲示板へのアクセスが可能になるあるユーザーのブックマークした掲示板の一覧を参照可能なページを作成する。
+
+  
+
+  **実装時の考え方2**
+  あるユーザーなので、userモデルに定義する必要がある。
+  まずはユーザーのブックマーク一覧を取得するので、bookmarksの参照が必要。
+  これだと、掲示板のidのみで中身を取得できないので、bookmarksを元にboardsの参照が必要
+  ということは、
+  through: :bookmarks　#中間テーブル(厳密にはuserモデルで定義しているアソシエーション名)
+  source: :board　#最終的に参照するモデルの単数形(厳密にはbookmarkモデルで定義しているアソシエーション名)
+  has_many :bookmarks_board
+  命名規約的におかしいので、単数_複数の形にする
+  has_many :bookmark_boards
 - has_one :through：中間モデルを介して一対一の関係を設定。例：SupplierがAccountを通じてAccountHistoryと関係する。
 - has_and_belongs_to_many：中間モデルなしで多対多の関係を設定。例：AssemblyとPartが互いに多対多の関係を持つ。
 
