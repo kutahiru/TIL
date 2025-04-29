@@ -15,8 +15,6 @@ https://rubygems.org/
 bundle open <gem名>
 ```
 
-
-
 ## better_errors
 
 デフォルトのエラー画面をわかりやすく整形してくれる
@@ -195,6 +193,13 @@ end
 docker compose exec web rails generate uploader BoardImage
 ```
 
+```ruby
+#app\uploaders\board_image_uploader.rb
+def default_url
+  'board_placeholder'
+end
+```
+
 ### Boardsテーブルにboard_imageカラムを追加・データベースに反映させる
 
 ```bash
@@ -267,6 +272,18 @@ hidden_fieldは、フォーム内に非表示のフィールドを生成する�
       <%= image_tag board.board_image_url, class: "card-img-top", width: "300", height:"200" %>
 ```
 
+### StrongParameter
+
+board_image_cacheは、
+フォームで画像をアップロードした後、他の項目でバリデーションエラーがあっても、再度画像を選択させないため
+フォームのhidden_fieldと紐づいている
+
+```ruby
+  def board_params
+    params.require(:board).permit(:title, :body, :board_image, :board_image_cache)
+  end
+```
+
 ## turbo-rails
 
 非同期処理
@@ -296,3 +313,167 @@ gem 'turbo-rails', '1.1.1'
 
 ②では、turbo_stream.replace の引数に渡されているID属性、unbookmark-button-for-board-xxx
 を探して、対象のDOMをブロック内のものと置き換える
+
+### Append
+
+comments という ID を持つ要素の**内部**に、@comment の部分テンプレートを追加する。
+これにより、新しいコメントがリストの最後に追加される
+Appendアクションは、新しい要素を既存のコンテンツの後に追加する際に使用する
+
+```erb
+<%= turbo_stream.append "comments" do %>
+  <%= render @comment %>
+<% end %>
+```
+
+### Prepend
+
+comments という ID を持つ要素の**内部**の最初に、@comment の部分テンプレートを追加する。
+これにより、新しいコメントがリストの先頭に追加される
+
+```erb
+<%= turbo_stream.prepend "comments" do %>
+  <%= render @comment %>
+<% end %>
+```
+
+### Replace
+
+comment_#{@comment.id} という ID を持つ要素を、@comment の部分テンプレートで置き換える。
+これにより、編集後のコメントが元のコメントと入れ替わる
+Replaceアクションは、既存の要素を新しい内容で置き換える際に使用する
+
+```erb
+<%= turbo_stream.replace "comment-#{@comment.id}" do %>
+  <%= render @comment %>
+<% end %>
+```
+
+### Update
+
+comment_likes_#{@comment.id} という ID を持つ要素の内容を、@comment.likes_count で更新する
+これにより、いいね数がリアルタイムで更新される。
+Updateアクションは、既存の要素の内容を部分的に更新する際に使用する
+
+```erb
+<%= turbo_stream.update "comment-likes_#{@comment.id}" do %>
+  <%= @comment.likes_count %>
+<% end %>
+```
+
+### Remove
+
+comment_#{@comment.id} という ID を持つ要素を削除する。
+これにより、指定したコメントが DOM から削除される。
+Remove アクションは、不要になった要素を DOM から取り除く際に使用する。
+
+```erb
+<%= turbo_stream.remove "comment-#{@comment.id}" %>
+```
+
+### Before
+
+comment_#{@comment.id} という ID を持つ要素の**直前**に、
+@new_comment の部分テンプレートを追加する。
+これにより、新しいコメントが指定した位置の前に追加される
+Before アクションは、特定の要素の前に新しい要素を追加する際に使用する
+
+```erb
+<%= turbo_stream.before "comment-#{@comment.id}" do %>
+  <%= render @new_comment %>
+<% end %>
+```
+
+### After
+
+comment_#{@comment.id} というIDを持つ要素の直後に、@new_comment の部分テンプレートを追加する。
+これにより、新しいコメントが指定した位置の後に追加される
+After アクションは、特定の要素の後に新しい要素を追加する際に使用する
+
+```erb
+<%= turbo_stream.after "comment-#{@comment.id}" do %>
+  <%= render @new_comment %>
+<% end %>
+```
+
+## kaminari
+
+Ruby on Rails アプリケーションでページネーション機能を簡単に実装するためのライブラリ
+https://github.com/kaminari/kaminari
+
+```
+gem 'kaminari', '1.2.2'
+```
+
+```bash
+#configファイル作成
+rails g kaminari:config
+```
+
+```ruby
+app\controllers\boards_controller.rb
+  def index
+    @boards = Board.includes(:user).page(params[:page]) #必要に応じて.per(20)とかを追加
+  end
+```
+
+```erb
+#app\views\boards\index.html.erb
+<%= paginate @boards %> #ページ数
+```
+
+## bootstrap5-kaminari-views
+
+gem 'kaminari' と Bootstrap 5 を組み合わせてページネーションのスタイルを簡単に適用するためのgem
+https://github.com/felipecalvo/bootstrap5-kaminari-views
+
+```
+gem 'bootstrap5-kaminari-views'
+```
+
+```erb
+<%= paginate @boards, theme: 'bootstrap-5' %> #ページ数
+```
+
+## ransack
+
+検索機能の強化
+https://activerecord-hackery.github.io/ransack/
+
+```
+gem 'ransack', '3.2.1'
+```
+
+```ruby
+def index
+  @q = Board.ransack(params[:q])
+  @boards = if @q.present?
+              @q.result.includes(:user).page(params[:page])
+            else
+              Board.includes(:user).page(params[:page])
+            end
+end
+
+def bookmarks
+  @q = current_user.bookmark_boards.ransack(params[:q])
+  @bookmark_boards = if @q.present?
+                       @q.result.page(params[:page])
+                     else
+                       current_user.bookmark_boards.page(params[:page])
+                     end
+end
+```
+
+```erb
+#app\views\boards\_search_form.html.erb
+<%= search_form_for q, url: url do |f| %>
+  <div class="input-group mb-3">
+    <%= f.search_field :title_or_body_cont, class: 'form-control', placeholder: t('defaults.search_word') %>
+    <div class="input-group-append">
+      <%= f.submit class: 'btn btn-primary' %>
+    </div>
+  </div>
+<% end %>
+```
+
+title_or_body_contは、「title列、もしくはbody列に検索ワードが含まれる」という条件指定
