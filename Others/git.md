@@ -129,6 +129,14 @@ git stash apply 復旧したいstash名
 git stash drop 削除したいstash名
 ```
 
+git addの取消
+
+```
+git reset HEAD
+```
+
+
+
 ## バージョン管理外にしたいファイル
 
 .gitignoreに記載する。
@@ -184,3 +192,20 @@ git pull origin master
 ```
 
 ![image-20250418083213378](C:\Users\kota\AppData\Roaming\Typora\typora-user-images\image-20250418083213378.png)
+
+## PullRequest プルリクエストの作成
+
+1. github-Pull Requestタブ-New pull requestボタン
+
+2. 対象のリポジトリを選択する
+
+   自分のリポジトリが選択できない時はURLを書き換え
+   **base repository**をクリックし、自分のアカウントのリポジトリを選択
+
+3. 対象のブランチを選択する
+   **compare**をクリックして、今回実装したブランチを選択
+
+4. PullRequestの概要を作成
+   Create pull requestボタン
+
+5. 最後に解答例を確認して、修正等なければGitHub上からPullRequestをマージ

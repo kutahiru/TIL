@@ -477,3 +477,79 @@ end
 ```
 
 title_or_body_contは、「title列、もしくはbody列に検索ワードが含まれる」という条件指定
+
+### カスタム述語
+
+```ruby
+#config\initializers\ransack.rb
+#vはcreate_dateになるから、create_date.end_of_dayを比較対象にしようする述語を作成している
+Ransack.configure do |config|
+  config.add_predicate 'lteq_end_of_day',
+    arel_predicate: 'lteq',
+    formatter: proc { |v| v.end_of_day }
+end
+
+#使用時
+<%= search_form_for @q, url: admin_boards_path do |f| %>
+  <div class="row">
+    <div class="d-flex align-items-center justify-content-center">
+      <div class="d-inline me-3">
+        <%= f.search_field :title_or_body_cont, class: 'form-control', placeholder: t('defaults.search_word') %>
+      </div>
+      <div class="d-inline me-3">
+        <%= f.date_field :created_at_gteq, class: 'form-control' %>
+      </div>
+      <div class="d-inline me-3">
+        <%= f.date_field :created_at_lteq_end_of_day, class: 'form-control' %>
+      </div>
+      <%= f.submit class: 'btn btn-primary' %>
+    </div>
+  </div>
+<% end %>
+```
+
+## letter_opener_web
+
+開発時にテストメールの確認が可能になる。
+https://github.com/fgrehm/letter_opener_web?tab=readme-ov-file
+
+```bash
+#development内
+gem 'letter_opener_web', '2.0.0'
+```
+
+## config
+
+環境ごとに異なる設定を一元管理することができ、
+開発環境、テスト環境、本番環境で異なる設定値を使いたい場合に非常に便利
+config/settings.ymlファイル に共通の設定を書き、以下に環境ごとの設定を書き分ける
+
+- config/settings/development.yml
+- config/settings/production.yml
+- config/settings/test.yml 
+
+https://github.com/rubyconfig/config
+
+```bash
+gem 'config', '4.0.0'
+```
+
+```bash
+rails g config:install
+
+#以下のファイルが作成される
+config/settings.yml #すべての環境で利用する定数を定義
+config/settings.local.yml
+config/settings/development.yml
+config/settings/production.yml
+config/settings/test.yml
+```
+
+## enum_help
+
+gem 'enum_help'とは、enumで定義した値を簡単にi18n化するためのgem
+
+```
+gem 'enum_help', '0.0.19'
+```
+

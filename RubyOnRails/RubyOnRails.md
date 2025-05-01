@@ -41,7 +41,23 @@ def edit
 end
 ```
 
+### 現在のリンクの強調表示
 
+指定されたパスが現在のコントローラのパスと一致する場合にCSSクラス'active'を返す
+ナビゲーションメニューの現在のページを視覚的に強調するために使用される。
+
+```ruby
+module ApplicationHelper
+  ... 省略 ...
+
+  def active_if(path)
+    path == controller_path ? 'active' : ''
+  end
+end
+
+例：<%= link_to 'Home', root_path, class: active_if('home') %>
+#コントローラのパスが'home'である場合、リンクに'active'クラスが追加され、スタイルが適用されます。
+```
 
 ## ページ表示の仕組み
 
@@ -378,3 +394,30 @@ render メソッドは、ビューをレンダリングし、クライアント�
 config.time_zone = 'Tokyo'
 ```
 
+## 管理画面
+
+管理画面は名前空間で通常画面とは論理的に分ける。
+
+```
+- コントローラー：app/controllers/配下にadminディレクトリを作成し、管理画面関連はそちらのディレクトリ配下に配置する。
+- ビュー：app/views/配下にadminディレクトリを作成し、管理画面関連はそちらのディレクトリ配下に配置する。
+- URL：namespaceを使ってadminを切り出し、管理画面関連はそちらに配置する。
+- アセット：管理画面用と分かるように整理・配置する。
+```
+
+```ruby
+#config\routes.rb
+  namespace :admin do
+    root "dashboards#index"
+    resource :dashboard, only: %i[index]
+    get 'login' => 'user_sessions#new', :as => :login
+    post 'login' => "user_sessions#create"
+    delete 'logout' => 'user_sessions#destroy', :as => :logout
+```
+
+| Helper            | HTTP verb | Path          | コントローラー#アクション   |
+| ----------------- | --------- | ------------- | --------------------------- |
+| admin_root_path   | GET       | /admin        | admin/dashboards#index      |
+| admin_login_path  | GET       | /admin/login  | admin/user_sessions#new     |
+| admin_login_path  | POST      | /admin/login  | admin/user_sessions#create  |
+| admin_logout_path | DELETE    | /admin/logout | admin/user_sessions#destroy |

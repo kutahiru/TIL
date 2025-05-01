@@ -239,6 +239,7 @@ app/helpers/application_helper.rb
 ### content_forメソッド
 
 Railsのビューヘルパーの一つで、ビューテンプレート内で特定の名前付きコンテンツブロックを定義し、そのコンテンツを別の場所（通常はレイアウトファイル）で表示するために使用する。
+以下はページのタイトルとして利用
 
 ```ruby
 module ApplicationHelper
