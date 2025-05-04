@@ -435,7 +435,7 @@ gem 'bootstrap5-kaminari-views'
 <%= paginate @boards, theme: 'bootstrap-5' %> #ページ数
 ```
 
-## ransack
+## ransack(検索機能)
 
 検索機能の強化
 https://activerecord-hackery.github.io/ransack/

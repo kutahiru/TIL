@@ -37,6 +37,7 @@ rails db:migrate:status
 ### 適用前に戻す場合
 
 ```bash
+docker compose exec web rails db:rollback #1つ前のマイグレーションに戻す
 rails db:rollback STEP=1 #1つ前のマイグレーションに戻す
 ```
 
