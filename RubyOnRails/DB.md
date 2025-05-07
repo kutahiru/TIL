@@ -70,7 +70,7 @@ rails db:migrate
 ### 新しいモデルとマイグレーションファイルを作成
 
 ```bash
-rails g model モデル名
+rails g model モデル名(単数形先頭大文字)
 #app/modelsディレクトリに〇〇.rbというファイルが生成
 #db/migrateディレクトリ配下に、データベースのテーブル構造を定義するマイグレーションファイルも生成
 ```

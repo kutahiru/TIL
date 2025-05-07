@@ -144,6 +144,8 @@ git reset HEAD
 .gitignoreに記載する。
 
 ```
+echo "DB.drawio" >> .gitignore
+
 # 指定したファイルを除外
 index.html
 # ルートディレクトリを指定

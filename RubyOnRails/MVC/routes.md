@@ -1,5 +1,9 @@
 # routes
 
+```
+root "homes#top"
+```
+
 ### ルーティングを一覧で確認
 
 http://localhost:3000/rails/info/routes
