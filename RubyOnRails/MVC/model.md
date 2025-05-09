@@ -120,8 +120,8 @@ DBに区分を持つ方法
 ```ruby
 class Book < Application
   enum sales_status: {
-    reservation: 0 #予約受付
-    now_on_sales: 1 #発売中
+    reservation: 0, #予約受付
+    now_on_sales: 1, #発売中
     end_of_print: 2 #販売終了
   }
 ```

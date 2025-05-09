@@ -553,3 +553,7 @@ gem 'enum_help'とは、enumで定義した値を簡単にi18n化するための
 gem 'enum_help', '0.0.19'
 ```
 
+## Google認証+Device
+
+認証ページに記載済
+
