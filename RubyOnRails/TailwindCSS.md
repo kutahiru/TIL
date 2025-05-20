@@ -13,6 +13,14 @@ app\assets\stylesheets\application.tailwind.css
 @tailwind utilities;
 ```
 
+```
+#監視
+bin/rails tailwindcss:watch
+
+#ビルド
+bin/rails tailwindcss:build
+```
+
 ## レスポンシブ対応
 
 - container
@@ -78,6 +86,12 @@ app\assets\stylesheets\application.tailwind.css
 |                                                  |
 +--------------------------------------------------+
 ```
+
+- 以下を指定すると余白を埋めるので、詰めて配置されず、横幅に対して子要素が均等間隔で配置される
+
+````
+md:ml-auto md:mr-auto
+````
 
 ### gap
 
@@ -207,3 +221,88 @@ bg-center: 背景画像をコンテナの中央に配置するよう指定
 ## CSSフィルター　
 
 ぼかし機能など
+
+## デザイン
+
+### 影
+
+```erb
+shadow-md shadow-black/60
+```
+
+丸み
+
+```
+rounded-2xl
+```
+
+テキストのぼかし背景
+
+```
+backdrop-blur-sm bg-white/60
+```
+
+TOPページ
+設定したブロックが全画面表示になる。
+
+```
+min-h-screen
+```
+
+
+
+## Alpine.js
+
+```bash
+yarn add alpinejs
+```
+
+```
+#app/javascript/application.js
+import Alpine from 'alpinejs'
+
+window.Alpine = Alpine
+Alpine.start()
+```
+
+```
+yarn build
+```
+
+## 不具合対応
+
+### 設定が反映されない場合
+
+safelistを設定すると反映される。
+ただ、普通は使わないらしい。
+
+## tailwind_merge
+
+
+使えなかった。動作しなかった。
+動的にスタイルを反映したい場合に使用する
+`tailwind_merge` メソッドは可変長引数（splat operator `*`）を使って、任意の数のクラス文字列を受け取ります：
+
+```erb
+tailwind_merge(class_string1, class_string2, ..., class_stringN)
+```
+
+```
+gem "tailwind_merge"
+```
+
+```ruby
+#app/helpers/application_helper.rb
+#全体で使用可能にする
+module ApplicationHelper
+  include TailwindMerge::Rails
+end
+```
+
+## stylesheetsの場所
+
+```
+#V4では以下に配置
+app/assets/tailwind/application.css
+```
+

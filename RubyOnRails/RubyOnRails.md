@@ -14,6 +14,7 @@ rails server
 ```
 
 ## Rubyで大事な点
+
 - メソッド呼び出し時の()を省略できる。　しなくて良い派もいるみたい。
 - 真偽値のメソッドには名前の最後に?を付けることが多い。
   is_successではなく、success?とする。
@@ -351,42 +352,6 @@ end
 Bundler（バンドラー）は、依存関係管理ツール
 Gemパッケージのバージョン管理や依存関係の解決を効率的に行うためのツール
 
-## フラッシュ機能
-
-```ruby
-#app/controllers/application_controller.rb
-add_flash_types :success, :danger
-```
-
-```ruby
-  def create
-    @user = User.new(user_params)
-    if @user.save
-      redirect_to root_path, success: "ユーザー登録が完了しました"　#成功時
-    else
-      flash.now[:danger] = 'ユーザー登録に失敗しました' #失敗時
-      render :new, status: :unprocessable_entity #HTTPステータスコード422
-    end
-  end
-```
-
-●status: :unprocessable_entity を指定する必要がある理由
-render メソッドは、ビューをレンダリングし、クライアントにレスポンスを提供するための主要なメソッドですが、デフォルトでは 200 OK ステータスコードが返されます。そのため、バリデーションエラーが発生していたとしても、クライアント側は正常なリクエストと認識してしまうためエラーメッセージが表示されません。status: :unprocessable_entity と指定することで、HTTPステータスコード422が返され、クライアントにリクエストの処理ができなかったことを適切に伝えています。
-
-```erb
-#成功時のview側
-#複数flashが設定されていれば、異なるdivとしてレンダリングされる
-<% flash.each do |message_type, message| %>
-  <div class="alert alert-<% message_type %>">
-    <%= message %>
-  </div>
-<% end %>
-
-#alert alert-<% message_type %>は、
-#BootstrapというCSSフレームワーク
-#alert クラスと、alert-success クラスを使用
-```
-
 ### タイムゾーンを東京に設定する
 
 ```
@@ -421,3 +386,21 @@ config.time_zone = 'Tokyo'
 | admin_login_path  | GET       | /admin/login  | admin/user_sessions#new     |
 | admin_login_path  | POST      | /admin/login  | admin/user_sessions#create  |
 | admin_logout_path | DELETE    | /admin/logout | admin/user_sessions#destroy |
+
+## ファビコン
+
+https://ao-system.net/favicon/
+ここで作ったファイルをpublicフォルダに配置する。
+public/site.webmanifestの中身を修正する
+
+```
+app/views/layouts/application.html.erb
+<!-- ファビコン設定 -->
+<link rel="icon" href="/favicon.ico">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="manifest" href="/site.webmanifest">
+```
+
+
+

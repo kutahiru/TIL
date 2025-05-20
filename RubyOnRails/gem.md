@@ -422,6 +422,14 @@ app\controllers\boards_controller.rb
 <%= paginate @boards %> #ページ数
 ```
 
+Kaminariページネーションを Tailwind CSS でモダンにカスタマイズする
+Kaminari のテンプレートをアプリケーションにコピーして、Tailwind CSS クラスを適用する
+
+```bash
+#コマンド実行で各viewが作成されるので、そのviewをカスタマイズ
+rails g kaminari:views default
+```
+
 ## bootstrap5-kaminari-views
 
 gem 'kaminari' と Bootstrap 5 を組み合わせてページネーションのスタイルを簡単に適用するためのgem
@@ -443,6 +451,10 @@ https://activerecord-hackery.github.io/ransack/
 ```
 gem 'ransack', '3.2.1'
 ```
+
+このindexは2回実行される想定になっている。
+1回目はparams[:q]はnilなので、@qを作成するため。
+2回目はparams[:q]に検索条件が設定された状態
 
 ```ruby
 def index
@@ -477,6 +489,17 @@ end
 ```
 
 title_or_body_contは、「title列、もしくはbody列に検索ワードが含まれる」という条件指定
+
+```ruby
+  #モデルに検索許可が必要。セキュリティのため。
+  def self.ransackable_attributes(auth_object = nil)
+    %w[title body]
+  end
+
+  def self.ransackable_associations(auth_object = nil)
+    [ "ideas", "user" ]
+  end
+```
 
 ### カスタム述語
 
@@ -551,6 +574,41 @@ gem 'enum_help'とは、enumで定義した値を簡単にi18n化するための
 
 ```
 gem 'enum_help', '0.0.19'
+```
+
+```ruby
+#config/application.rb
+    # デフォルトのロケールを日本語に設定
+    config.i18n.default_locale = :ja
+    
+    # サブディレクトリのロケールファイルも読み込む設定
+    config.i18n.load_path += Dir[Rails.root.join('config', 'locales', '**', '*.{rb,yml}').to_s]
+```
+
+```ruby
+#config/locales/activerecord/ja.yml
+ja:
+  enums:
+    category:
+      status:  # enum名
+        normal: "通常"
+        disabled: "無効"
+```
+
+```ruby
+#app/models/category.rb
+class Category < ApplicationRecord
+  enum status: {
+    normal: "0", # 通常
+    disabled: "1" # 無効
+  }
+```
+
+```erb
+#viewでの使用
+<td class="px-4 py-4 text-sm">
+  <%= category.status_i18n %>
+</td>
 ```
 
 ## Google認証+Device

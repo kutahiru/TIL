@@ -90,6 +90,19 @@ link_to("profile link", edit_profile_path)
 <% end %>
 ```
 
+### link_to_unless
+
+第一引数の条件に一致しなかったら
+link_to_ifは一致したら
+
+```erb
+<%=
+   link_to_unless(@current_user.nil?, "Reply", { action: "reply" }) do |name|
+     link_to(name, { controller: "accounts", action: "signup" })
+   end
+%>
+```
+
 ### render
 
 現在のリクエスト内でビューをレンダリング（描画）する処理
@@ -234,8 +247,6 @@ form_withヘルパーメソッドの中で使われるemail_fieldメソッド
 </div>
 ```
 
-
-
 ### helperとは
 
 ビューで使用するメソッドを定義するための場所
@@ -265,3 +276,109 @@ end
 <% content_for(:title, t('.title')) %>
 ```
 
+### メッセージ カスタムflash
+
+カスタムフラッシュタイプの追加
+
+```erb
+# app/controllers/application_controller.rb
+class ApplicationController < ActionController::Base
+  add_flash_types :success, :error, :info, :warning
+end
+```
+
+```erb
+#app/views/shared/_flash_message.html.erb
+<div class="container mx-auto px-4">
+  <% flash.each do |message_type, message| %>
+    <% if message_type == "success" %>
+      <div class="flex w-full max-w-sm overflow-hidden bg-white rounded-lg shadow-md">
+        <div class="flex items-center justify-center w-12 bg-emerald-500">
+          <svg class="w-6 h-6 text-white fill-current" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+            <path d="M20 3.33331C10.8 3.33331 3.33337 10.8 3.33337 20C3.33337 29.2 10.8 36.6666 20 36.6666C29.2 36.6666 36.6667 29.2 36.6667 20C36.6667 10.8 29.2 3.33331 20 3.33331ZM16.6667 28.3333L8.33337 20L10.6834 17.65L16.6667 23.6166L29.3167 10.9666L31.6667 13.3333L16.6667 28.3333Z" />
+          </svg>
+        </div>
+
+        <div class="px-4 py-2 -mx-3">
+          <div class="mx-3">
+            <span class="font-semibold text-emerald-500">Success</span>
+            <p class="text-sm text-gray-600"><%= message %></p>
+          </div>
+        </div>
+      </div>
+    <% elsif message_type == "error" %>
+      <div class="flex w-full max-w-sm overflow-hidden bg-white rounded-lg shadow-md">
+        <div class="flex items-center justify-center w-12 bg-red-500">
+          <svg class="w-6 h-6 text-white fill-current" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+            <path d="M20 3.36667C10.8167 3.36667 3.3667 10.8167 3.3667 20C3.3667 29.1833 10.8167 36.6333 20 36.6333C29.1834 36.6333 36.6334 29.1833 36.6334 20C36.6334 10.8167 29.1834 3.36667 20 3.36667ZM19.1334 33.3333V22.9H13.3334L21.6667 6.66667V17.1H27.25L19.1334 33.3333Z" />
+          </svg>
+        </div>
+
+        <div class="px-4 py-2 -mx-3">
+          <div class="mx-3">
+            <span class="font-semibold text-red-500">Error</span>
+            <p class="text-sm text-gray-600"><%= message %></p>
+          </div>
+        </div>
+      </div>
+    <% elsif message_type == "info" %>
+      <div class="flex w-full max-w-sm overflow-hidden bg-white rounded-lg shadow-md">
+        <div class="flex items-center justify-center w-12 bg-blue-500">
+          <svg class="w-6 h-6 text-white fill-current" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+            <path d="M20 3.33331C10.8 3.33331 3.33337 10.8 3.33337 20C3.33337 29.2 10.8 36.6666 20 36.6666C29.2 36.6666 36.6667 29.2 36.6667 20C36.6667 10.8 29.2 3.33331 20 3.33331ZM21.6667 28.3333H18.3334V25H21.6667V28.3333ZM21.6667 21.6666H18.3334V11.6666H21.6667V21.6666Z" />
+          </svg>
+        </div>
+
+        <div class="px-4 py-2 -mx-3">
+          <div class="mx-3">
+            <span class="font-semibold text-blue-500">Info</span>
+            <p class="text-sm text-gray-600"><%= message %></p>
+          </div>
+        </div>
+      </div>
+    <% elsif message_type == "warning" %>
+      <div class="flex w-full max-w-sm overflow-hidden bg-white rounded-lg shadow-md">
+        <div class="flex items-center justify-center w-12 bg-yellow-400">
+          <svg class="w-6 h-6 text-white fill-current" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+            <path d="M20 3.33331C10.8 3.33331 3.33337 10.8 3.33337 20C3.33337 29.2 10.8 36.6666 20 36.6666C29.2 36.6666 36.6667 29.2 36.6667 20C36.6667 10.8 29.2 3.33331 20 3.33331ZM21.6667 28.3333H18.3334V25H21.6667V28.3333ZM21.6667 21.6666H18.3334V11.6666H21.6667V21.6666Z" />
+          </svg>
+        </div>
+
+        <div class="px-4 py-2 -mx-3">
+          <div class="mx-3">
+            <span class="font-semibold text-yellow-400">Warning</span>
+            <p class="text-sm text-gray-600"><%= message %></p>
+          </div>
+        </div>
+      </div>
+    <% end %>
+  <% end %>
+</div>
+```
+
+利用方法
+
+```erb
+#app/views/layouts/application.html.erb
+    <div class="container">
+      <%= render "shared/flash_message" %>
+      <%= yield %>
+    </div>
+```
+
+```ruby
+  def create
+    @user = User.new(user_params)
+    if @user.save
+      redirect_to root_path, success: "ユーザー登録が完了しました"　#成功時
+    else
+      flash.now[:danger] = 'ユーザー登録に失敗しました' #失敗時
+      render :new, status: :unprocessable_entity #HTTPステータスコード422
+    end
+  end
+```
+
+●status: :unprocessable_entity を指定する必要がある理由
+render メソッドは、ビューをレンダリングし、クライアントにレスポンスを提供するための主要なメソッドですが、デフォルトでは 200 OK ステータスコードが返されます。そのため、バリデーションエラーが発生していたとしても、クライアント側は正常なリクエストと認識してしまうためエラーメッセージが表示されません。status: :unprocessable_entity と指定することで、HTTPステータスコード422が返され、クライアントにリクエストの処理ができなかったことを適切に伝えています。
+
+### 

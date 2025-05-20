@@ -2,6 +2,14 @@
 
 ## Docker 関連のファイル生成と編集
 
+```
+#自動起動にしていないため、起動のコマンド
+RUBY_DEBUG_OPEN=0.0.0.0:3333 bin/rails server -b 0.0.0.0 -p 3000
+
+#キルコマンド
+kill -9 4403
+```
+
 通常権限、DevContainers、LSPを使用する
 
 動かない拡張機能に対する対応
@@ -49,7 +57,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.dev
-    command: bash -c "bundle install && bundle exec rails db:create db:migrate && rm -f tmp/pids/server.pid && ./bin/dev"
+    command: bash -c "bundle install && bundle exec rails db:create db:migrate && rm -f tmp/pids/server.pid && tail -f /dev/null"
     tty: true
     stdin_open: true
     volumes:
@@ -70,18 +78,19 @@ volumes:
   bundle_data:
   postgresql_data:
   node_modules:
-
 ```
 
-
-
 ```bash
-#.devcontainer\devcontainer.json
+#.devcontainer/devcontainer.json
 {
   "name": "IdeaStorage",
   "dockerComposeFile": ["../compose.yml"],
   "service": "web",
   "workspaceFolder": "/myapp",
+  "memoryLimit": "4GB",
+  "remoteEnv": {
+  "RUBY_DEBUG_OPEN": "0.0.0.0:3333"
+  },
   "customizations": {
     "vscode": {
       "settings": {
@@ -99,7 +108,8 @@ volumes:
         "ionutvmi.path-autocomplete",
         "humao.rest-client",
         "bradlc.vscode-tailwindcss",
-        "shardulm94.trailing-spaces"
+        "shardulm94.trailing-spaces",
+        "spmeesseman.vscode-taskexplorer"
       ]
     }
   }
@@ -120,11 +130,22 @@ volumes:
   "configurations": [
     {
       "type": "rdbg",
-      "name": "Attach with rdbg",
-      "request": "attach"
+      "name": "Debug Rails Server",
+      "request": "launch",
+      "command": "bin/rails",
+      "script": "server",
+      "args": ["-b", "0.0.0.0", "-p", "3000"],
+      "askParameters": false
+    },
+    {
+      "type": "rdbg",
+      "name": "Attach to Rails",
+      "request": "attach",
+      "debugPort": "0.0.0.0:3333"
     }
   ]
 }
+
 ```
 
 ```bash
@@ -157,3 +178,14 @@ js: yarn build --watch
 css: yarn build:css --watch
 ```
 
+```ruby
+#gem-consoleの設定
+#config/environments/development.rb
+config.web_console.permissions = ['10.0.0.0/8', '172.16.0.0/12', '192.168.0.0/16']
+```
+
+### リアルタイムにログを表示
+
+```bash
+tail -f /myapp/log/development.log
+```

@@ -1,5 +1,11 @@
 # model
 
+### 便利メソッド
+
+```ruby
+モデル.persisted?() #DBに保存済かどうか
+```
+
 ### ActiveRecordのコールバック機能
 
 ```
@@ -64,6 +70,8 @@ validates(:content, {presence: true})
 validates(:content, {presence: true, length: {maximum: 140}})
 numericality #数値
 uniqueness: true #重複チェック
+
+validates :title, presence: true, length: { maximum: 30, message: "は50文字以内で入力してください" }
 ```
 
 validatesメソッドは可変長引数、第2引数以降はハッシュ形式の検証オプション
@@ -79,9 +87,12 @@ saveメソッドを呼び出した際にバリデーションに失敗すると�
 Railsでは自動的にエラーメッセージが生成されるようになっています。
 @post.errors.full_messagesの中に、エラー内容が配列で入ります。
 
-```rb
+```ruby
 @post.erros.full_messages do |message|
 <%= message %>
+
+#特定のカラムのエラーを取得
+@category.errors[:title].join(" ")
 ```
 
 ### scopeの定義
