@@ -35,6 +35,9 @@ RUN gem install bundler
 COPY . /myapp
 ```
 
+webサーバを自動で起動しないようにしている。
+自動起動にすると、webサービスが起動しない場合にDockerに入れなくて面倒だから。
+
 ```bash
 #compose.yml
 services:
@@ -168,7 +171,7 @@ docker compose build
 
 docker compose run --rm web gem install rails -v '~> 7.2.1'
 
-docker compose run --rm web rails new . -d postgresql -j esbuild --css=tailwind
+docker compose run --rm web rails new . -d postgresql -j esbuild
 ```
 
 ```bash

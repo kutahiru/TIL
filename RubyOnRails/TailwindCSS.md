@@ -1,16 +1,21 @@
 # TailwindCSS
 
+## インストールについて
+
+### gemを利用
+
+React/Vue等のSPAと組み合わせ等がなく、
+シンプルに利用するだけなら以下のgemのみの利用で良い
+
 ```
 gem 'tailwindcss-rails'
 ```
 
-app\assets\stylesheets\application.tailwind.css
+V4では以下に配置
+app\assets\tailwind\application.css
 
 ```
 @import "tailwindcss";
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
 ```
 
 ```
@@ -20,6 +25,10 @@ bin/rails tailwindcss:watch
 #ビルド
 bin/rails tailwindcss:build
 ```
+
+## npmを利用
+
+
 
 ## レスポンシブ対応
 
@@ -249,8 +258,6 @@ TOPページ
 min-h-screen
 ```
 
-
-
 ## Alpine.js
 
 ```bash
@@ -297,12 +304,5 @@ gem "tailwind_merge"
 module ApplicationHelper
   include TailwindMerge::Rails
 end
-```
-
-## stylesheetsの場所
-
-```
-#V4では以下に配置
-app/assets/tailwind/application.css
 ```
 

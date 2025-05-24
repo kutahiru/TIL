@@ -287,9 +287,12 @@ class ApplicationController < ActionController::Base
 end
 ```
 
+data-turbo-temporaryは再表示されないために付与
+一瞬だけ再表示されてしまう問題があった。
+
 ```erb
 #app/views/shared/_flash_message.html.erb
-<div class="container mx-auto px-4">
+<div class="container mx-auto px-4" data-turbo-temporary>
   <% flash.each do |message_type, message| %>
     <% if message_type == "success" %>
       <div class="flex w-full max-w-sm overflow-hidden bg-white rounded-lg shadow-md">
@@ -381,4 +384,9 @@ end
 ●status: :unprocessable_entity を指定する必要がある理由
 render メソッドは、ビューをレンダリングし、クライアントにレスポンスを提供するための主要なメソッドですが、デフォルトでは 200 OK ステータスコードが返されます。そのため、バリデーションエラーが発生していたとしても、クライアント側は正常なリクエストと認識してしまうためエラーメッセージが表示されません。status: :unprocessable_entity と指定することで、HTTPステータスコード422が返され、クライアントにリクエストの処理ができなかったことを適切に伝えています。
 
-### 
+### 戻るボタン
+
+```erb
+<%= link_to "戻る", :back, class: "px-8 py-2.5 leading-5 text-gray-500 transition-colors duration-300 transform bg-transparent border border-gray-300 rounded-md hover:bg-gray-100 hover:text-gray-600 focus:outline-none focus:ring-1 focus:ring-gray-300" %>
+```
+

@@ -516,10 +516,13 @@ rescue ZeroDivisionError => e
 end
 
 #↑は特定のエラーなので、全てのエラーをキャッチしたい場合は以下
+#ただ、railsでは基本のエラーはフレームワークにまかせる思想
 begin
   # 何らかの処理
 rescue => e #発生した例外をeに代入
   puts "エラーが発生しました: #{e.message}"
+ensure
+  # 例外の有無にかかわらず実行する処理
 end
 ```
 
@@ -535,6 +538,44 @@ puts data["name"]
 puts data["age"]
 puts data["is_student"]
 puts data["courses"]
+```
+
+### レシーバについて
+
+Rubyでは、特定の条件下でレシーバを省略できる
+
+```ruby
+#クラスやモジュール内で、自分自身（self）に対してメソッドを呼ぶ場合：
+class Person
+  def initialize(name)
+    @name = name
+  end
+  
+  def greet
+    puts "Hello, I'm #{name}"  # self.name の省略形
+  end
+  
+  private
+  
+  def name
+    @name
+  end
+end
+```
+
+```ruby
+#privateメソッドの場合
+class Calculator
+  def calculate(a, b)
+    add(a, b)  # private メソッドはレシーバ省略
+  end
+  
+  private
+  
+  def add(x, y)
+    x + y
+  end
+end
 ```
 
 ## 自動テストについて
@@ -562,3 +603,4 @@ end
 
 ### RSpec
 自動テスト。後で調べてみる
+
