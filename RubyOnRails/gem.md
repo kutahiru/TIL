@@ -615,3 +615,54 @@ class Category < ApplicationRecord
 
 認証ページに記載済
 
+## whenever
+
+cronをrubyの文法で設定可能になる
+※UNIX系のOSには、cronが標準で入っている
+スケジュールで処理の実行が可能になる
+
+```
+gem 'whenever', require: false #このfalseはRailsの実行時に読み込まないようにするため
+```
+
+```
+#インストール後、config/schedule.rbが作成される。
+bundle exec wheneverize .
+```
+
+```ruby
+#config\schedule.rb
+# Rails環境とアプリケーションパスの設定
+require File.expand_path(File.dirname(__FILE__) + "/environment") # Rails.root(Railsメソッド)を使用するために必要
+rails_env = ENV['RAILS_ENV'] || :development # cronを実行する環境変数(:development, :product, :test)
+set :environment, Rails.env
+set :output, "#{Rails.root}/log/cron.log"
+
+every :hour do # 1時間ごとに実行
+  rake "article:article_state_update"
+end
+```
+
+```bash
+# ファイル作成
+rails g task article
+
+# 基本形
+namespace :greet do
+  desc "タスクの説明" #desc → description（説明）
+  task task_name: :environment do #task_nameは自由につけられる
+    # 実行したい処理を記述する場所
+  end
+end
+
+namespace :article do
+  desc "ステータスを公開に変更"
+  task article_state_update: :environment  do
+    Article.where(published_at: Time.current.., state: :publish_wait).find_each do |article|
+      article.update!(state: :publish) 
+    end
+  end
+end
+
+```
+
