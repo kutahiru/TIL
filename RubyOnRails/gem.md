@@ -647,6 +647,7 @@ end
 # ファイル作成
 rails g task article
 
+# lib\tasks\article.rake
 # 基本形
 namespace :greet do
   desc "タスクの説明" #desc → description（説明）
@@ -664,5 +665,31 @@ namespace :article do
   end
 end
 
+```
+
+```bash
+# wheneverの設定更新
+bundle exec whenever --update-crontab
+
+# 設定内容にエラーがないか確認
+bundle exec whenever
+
+# 設定されているcronを見る
+crontab -l
+
+# crontabの設定削除（定期実行を辞めたいとき）
+bundle exec whenever --clear-crontab
+```
+
+```bash
+#エラー発生時のrakeタスク手動実行
+RAILS_ENV=development bundle exec rake article:article_state_update
+```
+
+
+
+```bash
+#動作確認のためフォアグラウンドで起動
+cron -f
 ```
 
