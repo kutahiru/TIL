@@ -686,10 +686,12 @@ bundle exec whenever --clear-crontab
 RAILS_ENV=development bundle exec rake article:article_state_update
 ```
 
-
-
 ```bash
 #動作確認のためフォアグラウンドで起動
 cron -f
 ```
 
+## Pundit
+
+権限によってアクセス制御をおこなう。
+アクション権限の調整が可能

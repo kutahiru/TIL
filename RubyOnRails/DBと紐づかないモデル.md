@@ -90,3 +90,13 @@ define_model_callbacks :save, only: %i[before after]
 複数のモデルActiveModel内の複数のモジュールが組み合わさっているモデル
 ActiveModel::Modelをincludeするだけで、オブジェクトをコントローラやビューのメソッドで利用できるようになる。
 モデル的なRubyクラスを実装する場合に使用する
+
+### ActiveModel::EachValidator
+
+カスタムバリデーターを作成できる
+ある一つの属性のバリデーションルールを定義するときに利用する
+
+### ActiveModel::Validator
+
+複数の属性を組み合わせたバリデーションルールなど、複雑なルールを定義する時に利用する
+
