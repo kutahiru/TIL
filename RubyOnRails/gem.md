@@ -541,6 +541,16 @@ https://github.com/fgrehm/letter_opener_web?tab=readme-ov-file
 gem 'letter_opener_web', '2.0.0'
 ```
 
+```ruby
+# config\routes.rb
+mount LetterOpenerWeb::Engine, at: "/letter_opener" if Rails.env.development?
+```
+
+```
+送信済メールの確認
+http://localhost:3000/letter_opener
+```
+
 ## config
 
 環境ごとに異なる設定を一元管理することができ、
@@ -649,7 +659,7 @@ rails g task article
 
 # lib\tasks\article.rake
 # 基本形
-namespace :greet do
+namespace :article do
   desc "タスクの説明" #desc → description（説明）
   task task_name: :environment do #task_nameは自由につけられる
     # 実行したい処理を記述する場所
