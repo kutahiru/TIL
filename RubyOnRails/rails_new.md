@@ -127,7 +127,7 @@ volumes:
 ```
 
 ```bash
-#vscode\launch.json
+#.vscode\launch.json
 {
   "version": "0.2.0",
   "configurations": [

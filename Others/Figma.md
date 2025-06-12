@@ -121,6 +121,10 @@
 - RemoveBG
   画像の背景削除
 
+- Icons8 Background Remover
+  
+  画像の背景削除
+  
 - Artboard Studio Mockups
 
   モックアップ画像が作成可能

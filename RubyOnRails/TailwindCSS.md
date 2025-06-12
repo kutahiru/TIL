@@ -11,7 +11,12 @@ React/Vue等のSPAと組み合わせ等がなく、
 gem 'tailwindcss-rails'
 ```
 
-V4では以下に配置
+```
+# gemのコマンドを使用してインストール
+bin/rails tailwindcss:install
+```
+
+V4 ではtailwind.config.js は不要、V4では以下に配置
 app\assets\tailwind\application.css
 
 ```
@@ -27,8 +32,6 @@ bin/rails tailwindcss:build
 ```
 
 ## npmを利用
-
-
 
 ## レスポンシブ対応
 
@@ -304,5 +307,26 @@ gem "tailwind_merge"
 module ApplicationHelper
   include TailwindMerge::Rails
 end
+```
+
+## フォントの変更
+
+GoogleFontで必要な情報を取ってくる
+フォントのURLとか、フォント名とか
+https://fonts.google.com/
+
+```ruby
+# app/views/layouts/application.html.erb
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic&display=swap" rel="stylesheet">
+```
+
+```css
+# app/assets/tailwind/application.css
+@theme {
+  /* 基本のsans-serifフォントを上書き */
+  --font-sans: "Zen Maru Gothic", "Hiragino Sans", "Yu Gothic", sans-serif;
+}
 ```
 

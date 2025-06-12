@@ -11,6 +11,7 @@ bin/rails console
 ```bash
 rails g controller posts #コントローラーとviewのフォルダだけ作成
 rails g controller posts index #対応するルーティング、Viewも作成される
+rails g controller home top #対応するルーティング、Viewも作成される
 ```
 
 ### ルーティング確認
