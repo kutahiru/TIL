@@ -560,30 +560,78 @@ rails g stimulus modal
 
 ```js
 # app/javascript/controllers/modal_controller.js
-
 import { Controller } from "@hotwired/stimulus"
-// BootstrapのModalをimport
-import { Modal } from "bootstrap"
 
+// Connects to data-controller="modal"
 export default class extends Controller {
-  // `connect()`はStimulusのライフサイクルコールバックの1つ
-  // コントローラーがHTML要素にアタッチされた時（=HTML要素が画面に表示された時）に実行される
-  connect() {
-    // モーダル生成
-    this.modal = new Modal(this.element)
+  static targets = ["backdrop", "content"]
 
-    // モーダルを表示する
-    this.modal.show()
+  connect() {
+    // モーダルを表示
+    this.show()
+    // ESCキーでモーダルを閉じる
+    this.boundKeyHandler = this.handleKeydown.bind(this)
+    document.addEventListener("keydown", this.boundKeyHandler)
+    // body要素のスクロールを無効にする
+    document.body.classList.add("overflow-hidden")
   }
 
-  // アクション定義
-  // 保存成功時にモーダルを閉じる
+  disconnect() {
+    // イベントリスナーを削除
+    document.removeEventListener("keydown", this.boundKeyHandler)
+    // body要素のスクロールを有効にする
+    document.body.classList.remove("overflow-hidden")
+  }
+
+  show() {
+    // モーダルを表示（フェードイン効果付き）
+    this.element.classList.remove("hidden", "pointer-events-none")
+    // this.element.classList.add("opacity-100", "pointer-events-auto")
+
+    // コンテンツをスケールアップ
+    if (this.hasContentTarget) {
+      this.contentTarget.classList.remove("scale-95")
+      this.contentTarget.classList.add("scale-100")
+    }
+  }
+
+  hide() {
+    // モーダルを非表示（フェードアウト効果付き）
+    // this.element.classList.remove("opacity-100", "pointer-events-auto")
+    this.element.classList.add("hidden", "pointer-events-none")
+
+    // コンテンツをスケールダウン
+    if (this.hasContentTarget) {
+      this.contentTarget.classList.remove("scale-100")
+      this.contentTarget.classList.add("scale-95")
+    }
+
+    // アニメーション完了後にモーダルを削除
+    setTimeout(() => {
+      this.element.remove()
+    }, 300) // transition-all duration-300に合わせる
+  }
+
+  // アクション定義：保存成功時にモーダルを閉じる
   close(event) {
     // event.detail.successは、レスポンスが成功ならtrueを返す
     // バリデーションエラー時はモーダルを閉じたくないので、成功時のみ閉じる
     if (event.detail.success) {
-      // モーダルを閉じる
-      this.modal.hide()
+      this.hide()
+    }
+  }
+
+  // 背景クリックでモーダルを閉じる
+  backdropClick(event) {
+    if (event.target === this.backdropTarget) {
+      this.hide()
+    }
+  }
+
+  // ESCキーでモーダルを閉じる
+  handleKeydown(event) {
+    if (event.key === "Escape") {
+      this.hide()
     }
   }
 }
@@ -594,14 +642,34 @@ export default class extends Controller {
 <%# `"modal"`という<turbo-frame>で囲う %>
 <%= turbo_frame_tag "modal" do %>
   <%# modalコントローラーをアタッチする %>
-  <div class="modal fade" data-controller="modal">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title"><%= title%></h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+  <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 hidden pointer-events-none transition-all duration-300"
+       data-controller="modal"
+       data-modal-target="backdrop">
+
+    <%# モーダルダイアログ %>
+    <div class="relative w-full max-w-md mx-4 p-0 pointer-events-auto"
+         data-modal-target="content">
+
+      <%# モーダルコンテンツ %>
+      <div class="bg-white rounded-lg shadow-xl transform scale-95 transition-transform duration-300">
+
+        <%# モーダルヘッダー %>
+        <div class="flex items-center justify-between p-4 border-b border-gray-200 bg-beige-500 rounded-t-lg">
+          <h5 class="text-xl font-bold text-dark-65 m-0">
+            <%= title %>
+          </h5>
+          <button type="button"
+                  class="text-gray-400 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 rounded-md p-1 transition-colors"
+                  data-action="click->modal#hide"
+                  aria-label="Close">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+          </button>
         </div>
-        <div class="modal-body">
+
+        <%# モーダルボディ %>
+        <div class="p-4">
           <%= yield %>
         </div>
       </div>
@@ -612,28 +680,147 @@ export default class extends Controller {
 
 ```erb
 # app/views/cats/_form.html.erb
-<%= turbo_frame_tag cat do %>
-  <%# レイアウトをモーダル用に整える %>
-  <%# turbo:submit-end（Turboのsubmit後）イベント発火時に、modal#close（モーダルを閉じる）を実行する %>
-  <%= bootstrap_form_with(model: cat, data: { action: "turbo:submit-end->modal#close" }) do |form| %>
-    <%= form.text_field :name %>
-    <%= form.text_field :age %>
-    <%= form.primary %>
-  <% end%>
+<%= form_with(model: medication_schedule, local: false,
+  data: { action: "turbo:submit-end->modal#close" }
+  ) do |form| %>
+
+<%# タイトル %>
+<div class="mb-4">
+  <%= form.label :title, "タイトル", class: "block text-md font-medium text-gray-700 mb-2" %>
+  <%= form.text_field :title, class: "mt-1 block md:w-1/2 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 font-semibold text-lg", placeholder: "朝のおくすり" %>
+  <%# エラーメッセージ表示 %>
+  <% if medication_schedule.errors[:title].any? %>
+    <div class="mt-1 text-sm text-red-600">
+      <%= medication_schedule.errors[:title].first %>
+    </div>
+  <% end %>
+</div>
+
+  <%# 通知時間 %>
+  <div class="mb-4">
+    <%= form.label :medication_time, "通知時間", class: "block text-md font-medium text-gray-700 mb-2" %>
+    <div class="flex items-center space-x-2">
+      <div>
+        <%= form.time_select :medication_time,
+              {
+                minute_step: 15,
+                prompt: { hour: '時', minute: '分' }
+              },
+              {
+                class: "px-3 py-2 text-lg font-semibold border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition-colors bg-white appearance-none #{'border-red-300 focus:ring-red-500 focus:border-red-500' if medication_schedule.errors[:medication_time].any?}"
+              } %>
+      </div>
+      <svg class="w-5 h-5 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+      </svg>
+    </div>
+    <%# エラーメッセージ表示 %>
+    <% if medication_schedule.errors[:medication_time].any? %>
+      <div class="mt-1 text-sm text-red-600">
+        <%= medication_schedule.errors[:medication_time].first %>
+      </div>
+    <% end %>
+  </div>
+
+
+<%# リマインド回数 %>
+<div class="my-4">
+  <%= form.label :reminder_count, "リマインド回数", class: "block text-md font-medium text-gray-700 mb-2" %>
+  <div class="space-y-3">
+    <!-- カード式の選択肢 -->
+    <div class="grid grid-cols-4 gap-2">
+      <% [0, 1, 2, 3].each do |count| %>
+        <label class="relative cursor-pointer">
+          <%= form.radio_button :reminder_count, count, 
+                class: "sr-only peer" %>
+          <div class="p-3 border-2 border-gray-200 rounded-lg text-center transition-all duration-200 peer-checked:border-teal-500 peer-checked:bg-teal-100 hover:border-gray-300">
+            <div class="text-lg font-semibold text-gray-900"><%= count %>回</div>
+          </div>
+        </label>
+      <% end %>
+    </div>
+
+  <%# エラーメッセージ表示 %>
+  <% if medication_schedule.errors[:reminder_count].any? %>
+    <div class="mt-1 text-sm text-red-600">
+      <%= medication_schedule.errors[:reminder_count].first %>
+    </div>
+  <% end %>
+</div>
+
+  <%# リマインド間隔 %>
+  <div class="my-4">
+    <%= form.label :reminder_interval, "リマインド間隔", class: "block text-md font-medium text-gray-700 mb-2" %>
+    <div class="space-y-3">
+      <!-- カード式の選択肢 -->
+      <div class="grid grid-cols-4 gap-1">
+        <% [[15, "15分"], [30, "30分"], [45, "45分"], [60, "60分"]].each do |value, label| %>
+          <label class="relative cursor-pointer">
+            <%= form.radio_button :reminder_interval, value, 
+                  class: "sr-only peer" %>
+            <div class="p-3 border-2 border-gray-200 rounded-lg text-center transition-all duration-200 peer-checked:border-teal-500 peer-checked:bg-teal-100 hover:border-gray-300">
+              <div class="text-lg font-semibold text-gray-900"><%= label %></div>
+            </div>
+          </label>
+        <% end %>
+      </div>
+
+    <%# エラーメッセージ表示 %>
+    <% if medication_schedule.errors[:reminder_interval].any? %>
+      <div class="mt-1 text-sm text-red-600">
+        <%= medication_schedule.errors[:reminder_interval].first %>
+      </div>
+    <% end %>
+  </div>
+
+
+  <%# 家族通知タイミング %>
+  <div class="my-4">
+    <%= form.label :family_notification_delay, "家族通知タイミング", class: "block text-md font-medium text-gray-700 mb-2" %>
+    <div class="space-y-3">
+      <!-- カード式の選択肢 -->
+      <div class="grid grid-cols-4 gap-1">
+        <% [[30, "30分後"], [60, "60分後"], [90, "90分後"], [120, "120分後"]].each do |value, label| %>
+          <label class="relative cursor-pointer">
+            <%= form.radio_button :family_notification_delay, value, 
+                  class: "sr-only peer" %>
+            <div class="p-3 border-2 border-gray-200 rounded-lg text-center transition-all duration-200 peer-checked:border-teal-500 peer-checked:bg-teal-100 hover:border-gray-300">
+              <div class="text-lg font-semibold text-gray-900"><%= label %></div>
+            </div>
+          </label>
+        <% end %>
+      </div>
+
+    <%# エラーメッセージ表示 %>
+    <% if medication_schedule.errors[:family_notification_delay].any? %>
+      <div class="mt-1 text-sm text-red-600">
+        <%= medication_schedule.errors[:family_notification_delay].first %>
+      </div>
+    <% end %>
+  </div>
+
+  <%# 送信ボタン %>
+  <div class="flex justify-end space-x-3 pt-4">
+
+    <%# 送信ボタン %>
+    <%= form.submit medication_schedule.persisted? ? "更新" : "作成",
+        class: "px-4 py-2 text-sm font-medium text-gray-700 bg-sage-500 border border-transparent rounded-md hover:bg-sage-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors" %>
+
+    <%# キャンセルボタン %>
+    <button type="button"
+            data-action="click->modal#hide"
+            class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-colors">
+      キャンセル
+    </button>
+  </div>
+
 <% end %>
 ```
 
 ```erb
 # app/views/cats/edit.html.erb
-<%= render "modal", title: "編集" do %>
-  <%= render "form", cat: @cat %>
-<% end %>
-```
-
-```erb
-# app/views/cats/new.html.erb
-<%= render "modal", title: "登録" do %>
-  <%= render "form", cat: @cat %>
+<%= render "application/modal", title: "編集" do %>
+  <%= render "form", medication_schedule: @medication_schedule %>
 <% end %>
 ```
 
@@ -653,16 +840,32 @@ export default class extends Controller {
 
 ```erb
 # app/views/cats/index.html.erb
-         <%= link_to icon_with_text("plus-circle", "登録"),
-                     new_cat_path,
-                     class: "btn btn-outline-primary",
-                     data: { turbo_frame: "modal" }
-         %>
-       </div>
-     </div>
-
-     <div id="cats">
-       <%= render @cats %>
-     </div>
+      <div class="flex items-center mt-4 gap-2">
+        <%= link_to "編集",
+        edit_medication_schedule_path(medication_schedule.id),
+        class: "block mt-2 px-4 py-2 bg-sage-500 rounded-xl text-center hover:bg-sage-600 transition-colors",
+        data: { turbo_frame: "modal" } %>
+      </div>
 ```
 
+### 命名規則による自動紐づけ
+
+```erb
+# コントローラー名の対応
+HTML: data-controller="invitation"
+↓
+ファイル: app/javascript/controllers/invitation_controller.js
+```
+
+```
+# アクション名の対応
+HTML: data-action="click->invitation#generate"
+↓
+JavaScript: generate(event) { ... }
+```
+
+### Stimulus利用のデータ取得の考え方
+
+- シンプルなデータ → JSON
+- 複雑なHTML → HTML partial
+- リアルタイム更新 → Turbo Stream

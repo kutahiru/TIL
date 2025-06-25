@@ -86,13 +86,16 @@ volumes:
 ```bash
 #.devcontainer/devcontainer.json
 {
-  "name": "IdeaStorage",
+  "name": "okusuri_nondene",
   "dockerComposeFile": ["../compose.yml"],
   "service": "web",
   "workspaceFolder": "/myapp",
   "memoryLimit": "4GB",
+  "features": {
+    "ghcr.io/anthropics/devcontainer-features/claude-code:1.0": {}
+  },
   "remoteEnv": {
-  "RUBY_DEBUG_OPEN": "0.0.0.0:3333"
+    "RUBY_DEBUG_OPEN": "0.0.0.0:3333"
   },
   "customizations": {
     "vscode": {
