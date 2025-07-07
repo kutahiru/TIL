@@ -28,6 +28,12 @@ rails db:migrate:reset
 rails db:rollback
 ```
 
+### 特定のファイルのロールバック
+
+```bash
+rails db:migrate:down VERSION=20240115123456
+```
+
 ### 適用状況確認
 
 ```bash
