@@ -1,6 +1,8 @@
 # React
 
-npm create vite@latest . --template react-ts
+## Tips
+
+- ctrl + 左クリックで型定義に移動
 
 ## スタイルの適用
 
@@ -277,5 +279,149 @@ export const App = () => {
     //省略
   );
 };
+```
+
+## メモ化
+
+コンポーネント、変数、関数などの再レンダリング時の制御をするにはメモ化を行う。
+前回の処理結果を保持しておくことで、処理を高速化する技術
+本来、親のコンポーネントが再レンダリングされると、子も再レンダリングされるが、
+それを防ぐことが可能になる。
+コンポーネント関数をmemoで囲むだけでPropsに変更がない限り再レンダリングされない。
+
+```jsx
+const Component = memo(() => {});
+```
+
+### useCallback
+
+関数をPropsに渡す時にコンポーネントをメモ化していても再レンダリングされてしまう原因は、関数の再生成。
+関数をPropsとして受け取っている場合、Propsが変化したと判定されて再レンダリングされてしまう。
+useCallbackを使用して関数のメモ化を行う必要がある。
+useCallbackは第一引数に関数、第二引数に依存配列を設定する。
+依存配列を空にすれば最初に作成された関数が使いまわされる。
+
+子コンポーネントにPropsとして渡す関数はuseCallbackを使用してメモ化すると良い。
+
+```jsx
+const onClickButton = useCallback(() => {
+  alett('ボタンが押されました！');
+}, []);
+```
+
+## グローバルなState管理
+
+StateをPropsで何段階も渡していくのはやらない。
+Contextを使用してStateを管理する。
+
+- React.createContextでContextの器を作成する。
+
+- 作成したContextのProviderでグローバルStateを扱いたいコンポーネントを囲む
+
+  ```jsx
+  // AdminFlagProvider.jsx
+  import { createContext, useState } from "react";
+  
+  // Context（状態を共有する箱）を作成
+  export const AdminFlagContext = createContext({});
+  
+  // 関数コンポーネントを定義 propsを受け取る
+  export const AdminFlagProvider = props => {
+    const { children } = props //子要素の取り出し
+    
+    //isAdmin という状態変数と、それを変更するsetIsAdmin関数を作成
+    const [isAdmin, setIsAdmin] = useState(false);
+    
+    return (
+      // value に isAdmin と setIsAdmin を渡して、子要素からアクセスできるようにする
+      // AdminFlagContext.ProviderはvalueというPropsを受け取っている
+      <AdminFlagContext.Provider value={{ isAdmin, setIsAdmin}}>
+        {children}
+      </AdminFlagContext.Provider>
+    );
+  };
+  ```
+
+- Stateを参照したいコンポーネントでReact.useContextを使用する。
+
+  ```jsx
+  // EditButton.jsx
+  import { useContext } from "react"
+  
+  import { AdminFlagContext } from "./providers/AdminFlagProvider";
+  
+  const style = {
+    width: "100px",
+    padding: "6px",
+    borderRadius: "8px"
+  };
+  
+  export const EditButton = () => {
+    //Context内のisAdminを取得
+    const { isAdmin } = useContext(AdminFlagContext);
+    
+    return (
+      <button style={style} disabled={!isAdmin}>
+        編集
+      </button>
+    );
+  };
+  ```
+
+  ```jsx
+  // App.jsx
+  import { useContext } from "react"
+  
+  import { AdminFlagContext } from "./components/providers/AdminFlagProvider";
+  import { Card } from "./components/Card";
+  
+  export const App = () => {
+    //Context内のisAdminと更新関数を取得
+    //最も近い <AdminFlagProvider> を見つけて、そのProviderの value プロパティの値を取得している
+    const { isAdmin, setIsAdmin } = useContext(AdminFlagContext);
+    
+    const onClickSwitch = () => setIsAdmin(!isAdmin);
+    
+    return (
+      <div>
+        {isAdmin ? <span>管理者です</span> : <span>管理者以外です</span>}
+        <button onClick={onClickSwitch}>切り替え</button>
+        <Card isAdmin={isAdmin} />
+      </div>
+    );
+  };
+  ```
+
+  ```
+  //データの流れ
+  AdminFlagProvider.jsx
+      ↓ value={{ isAdmin, setIsAdmin }} を設定
+  AdminFlagContext
+      ↓ useContext で取得
+  App.jsx
+      ↓ isAdmin と setIsAdmin が使用可能
+  ```
+
+
+## カスタムフック
+
+React Hooksとは、関数コンポーネントで状態管理やライフサイクル機能など、
+Reactの機能をクラスコンポーネントなしに使えるようにする機能
+カスタムフックは任意の処理をまとめて自作するフックのこと。
+src/hooks
+
+```js
+// src/hooks/useFetchUsers.js
+import { useState } from "react";
+
+//ユーザー一覧を取得するカスタムフック
+export const useFetchUsers = () => {
+  const [userList, setUserList] = useState([{ id: 1 }]);
+  
+  const onClickFetchUser = () => alert('関数実行')
+  
+  // まとめて返却したいのでオブジェクトに設定する
+  return { userList, onClickFetchUser }
+}
 ```
 

@@ -221,6 +221,35 @@ const message = `私の名前は${name}です。年齢は${age}歳です。`;
 console.log(message);
 ```
 
+## 引数の分割代入
+
+showDialogの定義で{}が囲われているのは、分割代入のため。
+引数の順序を気にせずに一部の引数だけを渡せる。
+名前付き引数ができる。
+
+```js
+function showDialog({
+  content = '',
+  title = 'My Dialog',
+  width = 100,
+  height = 100,
+  position = 'center',
+  modal = false
+}) {	
+  console.log(`content: ${content}`);
+  console.log(`title: ${title}`);
+  console.log(`width: ${width}`);
+  console.log(`height: ${height}`);
+  console.log(`position: ${position}`);
+  console.log(`modal: ${modal}`);
+}
+
+showDialog({
+  content: 'ダイアログです。',
+  modal: true,
+});
+```
+
 ## スプレット構文
 
 ...という形でドットを3つ繋げて使用できる。
@@ -251,7 +280,7 @@ const user = {
 
 console.log(user) //{name: "主田", age: 24}
 
-//上記をユーザーオブジェクトの定義部分を以下のように省略して実装できる
+//上記のユーザーオブジェクトの定義部分を以下のように省略して実装できる
 const user = {
   name,
   age,
@@ -260,3 +289,71 @@ const user = {
 console.log(user) //{name: "主田", age: 24}
 ```
 
+## モジュール
+
+exportキーワードでモジュールの定義
+
+```js
+const AUTHOR = 'YAMADA, Yoshihiro';
+
+export function getTriangleArea(base, height) {
+  return base * height / 2;
+}
+
+export class Member {
+  constructor(name = '名無権兵衛', age = 0) {
+    this.name = name;
+    this.age = age;
+  }
+
+  show() {
+    console.log(`私の名前は${this.name}、${this.age}歳です。`);
+  }
+}
+```
+
+import命令でモジュールをインポート
+
+```js
+import { getTriangleArea, Member } from './lib/util.js';
+// import { Member } from './lib/util.js';
+
+// let path = './lib/util.js';
+// import { getTriangleArea, Member } from path;
+
+console.log(getTriangleArea(10, 2));
+
+let m = new Member('佐藤理央', 25);
+m.show();
+
+console.log(import.meta);
+
+```
+
+### export default
+
+defaultを一つだけ設定可能
+
+```js
+export const VERSION = '2.0';
+
+export default class {
+  static circle(radius) {
+    return (radius ** 2) * Math.PI;
+  }
+}
+```
+
+規定のエクスポートになるため、関数/クラス名の名前を省略可能。
+Areaという名前でアクセスできる。
+Areaという名前は自由に命名可能。
+
+```js
+import Area from './lib/area.js';
+
+console.log(Area.circle(10));
+```
+
+### まとめることもできる
+
+複数の機能をimportしたファイルを一つ用意して、それを複数でimportすれば、各所のimportがすっきりする。
