@@ -92,35 +92,6 @@ window.addEventListener('load', () => {
 })
 ```
 
-## Promiseについて
-
-Promiseはresolve()やreject()という決まった関数が実行されてから、次の処理を動かす仕組み
-async/awaitを使った方法でも同じような処理をわかりやすいコードで記載することができる
-
-```js
-new Promise((resolve, reject) => {
-  // 非同期で処理したいことを記述
-  // 成功したらresolve()を呼ぶ
-  resolve()
-  // 失敗したらreject()を呼ぶ
-  reject()
-}).then(() => {
-  // 上のresolve()が実行された後の処理
-  })
-  .catch(() => {
-  // 上のreject()が実行された後の処理
-  })
-
-new Promise((resolve, reject) => {
-  resolve()
-}).then(() => {
-    console.log("resolveが実行されてthenの処理が動きました")
-  })
-  .catch(() => {
-    console.log("rejectが実行されてcatchの処理が動きました")
-  })
-```
-
 ## 仮想DOM
 
 仮想DOMと実際のDOMを比較し変更箇所のみを実際のDOMに反映することができる。
@@ -267,7 +238,10 @@ summaryFunc(arr1[0], arr[1]); //3
 summaryFunc(arr1...) //3
 ```
 
-## オブジェクトの省略記法
+## オブジェクトリテラル
+
+jsのオブジェクトは連想配列、辞書とかハッシュとかと同じもの。
+const obj = {}がオブジェクトリテラル
 
 ```js
 const name = "主田";
@@ -279,8 +253,13 @@ const user = {
 };
 
 console.log(user) //{name: "主田", age: 24}
+```
 
-//上記のユーザーオブジェクトの定義部分を以下のように省略して実装できる
+### オブジェクトリテラルの省略記法
+
+```js
+// 上記のユーザーオブジェクトの定義部分を以下のように省略して実装できる
+// 同一の変数が存在しているから利用できる
 const user = {
   name,
   age,
