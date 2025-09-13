@@ -439,3 +439,37 @@ console.log(uhyo.age);
 import { createInterface } from "readline"
 ```
 
+## Promiseオブジェクト
+
+Promiseベースの非同期処理では非同期処理を行う関数は関数を受け取らずにPromiseオブジェクトを返す。
+そのPromiseオブジェクトに対してい終わった後に行う処理を表す関数を登録する
+
+Promise版のfs(ファイル操作)
+pの方はPromise<string>
+Promiseオブジェクトはthenメソッドを持っている。
+このメソッドが引数としてコールバック関数を受け取る。
+このメソッドはPromiseオブジェクトの非同期処理が完了したら実行される。
+
+- 従来の非同期処理
+  非同期処理を行う関数にコールバック関数を直接渡す
+- Promise版の非同期処理
+  非同期処理を行う関数はPromiseオブジェクトを返す。
+  返されたPromiseオブジェクトにthenでコールバック関数を渡す。
+
+前者の方式だと使いたいAPIごとにどのようにコールバック関数を渡せばいいか調べる必要がある。
+後者の方式だとどんな関数でもPromiseオブジェクトを返すので共通の考え方で済む。
+
+```ts
+import { readFile } from "fs/promises"
+
+const p = readFile("foo.txt", "utf-8");
+
+p.then((data) => {
+  console.log(data);
+})
+```
+
+## asymc/await構文
+
+asyncの戻り値は必ずPromiseになる。
+async/awaitは「**その関数内では順序通りに見える**」が、「**他の処理は並行して動き続ける**」という特徴がある

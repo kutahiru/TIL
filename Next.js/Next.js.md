@@ -2,13 +2,54 @@
 
 React.jsを基にしたWebアプリケーション開発のためのフレームワーク
 
-## プライベートフォルダについて
+## App Routerとは
+
+ファイルベースルーティング
+app/ フォルダ配下に page.tsx を置くことでルートに対応したページが自動的に生成されます。
+
+- app/page.tsx → / に対応
+- app/about/page.tsx → /about に対応
+- app/contact/page.tsx → /contact に対応
+
+### 動的ルーティング
+
+[id]にすると動的ルーティングとして認識される。
+取得したい場合は、関数コンポーネントの引数にオブジェクトの{params}を指定する。{}はオブジェクト。
+propsやurlなどの情報を受け取る際は非同期関数を使用することを推奨
+
+```tsx
+// src/app/blog/[id]/page.tsx
+export default async function BlogPage({params}) {
+  const {id} = await params //分割代入
+
+  return (
+    <div>blogID:{id}</div>
+  )
+}
+
+//実際はparamsの型を定義するべき
+type Pamaras = {
+  params: Promise<{
+    id: string
+  }>
+}
+
+export default async function BlogPage({params}: Pamaras) {
+  const {id} = await params //分割代入
+
+  return (
+    <div>blogID:{id}</div>
+  )
+}￥
+```
+
+### プライベートフォルダについて
 
 App Router では、アンダースコア（_）で始まるフォルダは「プライベートフォルダ」として扱われる。
 URL ルーティングの対象にならない
 ページの部品（コンポーネント）としてのみ利用される
 
-- src/components/（共通コンポーネント）
+- src/_components/（共通コンポーネント）
   複数ページで共通して使うコンポーネントを置く場所です。
   ヘッダーやフッター、共通ボタン、モーダル、レイアウト部品をまとめます。
 - src/app/blog/_components/（ページ専用コンポーネント）
@@ -180,4 +221,80 @@ export default function Error({
   )
 }
 ```
+
+## layout.tsx
+
+アプリ全体に影響するレイアウト
+htmlタグやbodyタグを書く場所
+各ページの内容は{children}の箇所に表示される。
+ヘッダー、フッターなど
+
+```tsx
+export default function RootLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
+  return (
+    <html lang="ja">
+      <body>
+        <header className="bg-blue-200 p-4">Rootヘッダー</header>
+        {children}
+      </body>
+    </html>
+  );
+}
+```
+
+### layoutファイルを自分で作成
+
+下層に影響させてもいいなら自分で作成することもできる。
+統一のレイアウトの場合に利用できる。
+
+```tsx
+// src/app/about/layout.tsx
+export default function AboutLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>
+) {
+  return (
+    <div className="bg-gray-100 h-screen">
+      { children }
+    </div>
+  )
+}
+```
+
+## APIのルートハンドラ
+
+サーバサイドで動作するHTTPエンドポイントを作成できる。
+
+```ts
+// src/app/api/hello/route.ts
+import { NextResponse } from "next/server"
+
+// 本来はAPIを実行する
+export async function GET() {
+  return NextResponse.json([
+    {id: 1, 'name': '山田'},
+    {id: 2, 'name': '田中'}
+  ])
+}
+```
+
+## ４通りのデータ操作
+
+- 従来：fetch,axiosでAPI通信(CRUD)
+- Route Handlers(APIエンドポイント)(CRUD)
+  サーバ側で更新
+  Auth.jsを使用した認証機能
+- RSCで情報取得(R)
+  サーバ側でRead
+  記事一覧/詳細の取得の場合、DB直接アクセス
+- ServerActions(CUD)
+  フォームと連動する機能、サーバ側で更新
+  記事の検索
+  認証後の投稿/編集
 

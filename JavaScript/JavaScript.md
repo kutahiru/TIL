@@ -532,6 +532,7 @@ Promise.allSettled([
 async/await構文を利用することで同期的に表現できる。
 ここでいう同期的とはmainの中は同期的という意味
 mainの外部は非同期で実行される。
+async/awaitは「**その関数内では順序通りに見える**」が、「**他の処理は並行して動き続ける**」という特徴がある
 
 ```js
 function asyncProcess(value) {
