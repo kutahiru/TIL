@@ -231,6 +231,8 @@ export const ColoredMessage = ( { color, childred } ) => {
 useStateという関数を使用してStateを扱う
 const [num, setNum] = useState(0);
 numが状態を持った変数、setNumが状態を更新する関数
+Stateが変わった際に再レンダリングされる
+この例だと、setNumが実行されると画面が再レンダリングされる。
 
 ```jsx
 // src/app.jsx
@@ -280,6 +282,12 @@ export const App = () => {
   );
 };
 ```
+
+自分メモ
+
+useEffectは第一引数に、第二引数で変更があった場合に実行する処理を実装する 第一引数は戻り値として、undefinedかクリーンアップ関数が必要
+
+useEffect自体の役割としては、第一引数で受け取った関数を保持していて、 第二引数で変更があった場合に実行する さらに該当のコンポーネントがアンマウントされた場合に、第一引数を実行した時の戻り値として受け取っていたクリーンアップ関数があればそれを実行するって感じ
 
 ## メモ化
 
@@ -402,26 +410,82 @@ Contextを使用してStateを管理する。
       ↓ isAdmin と setIsAdmin が使用可能
   ```
 
-
 ## カスタムフック
 
-React Hooksとは、関数コンポーネントで状態管理やライフサイクル機能など、
-Reactの機能をクラスコンポーネントなしに使えるようにする機能
-カスタムフックは任意の処理をまとめて自作するフックのこと。
 src/hooks
+カスタムフックは内部でReact Hooksを使っているかどうか。
+React Hooksを使う処理を関数にしたいと思った時にカスタムフックを実装する
+状態管理を関数に出すということ
 
-```js
-// src/hooks/useFetchUsers.js
-import { useState } from "react";
+そのため、コンポーネント⇔カスタムフックのインターフェイスは、
 
-//ユーザー一覧を取得するカスタムフック
-export const useFetchUsers = () => {
-  const [userList, setUserList] = useState([{ id: 1 }]);
-  
-  const onClickFetchUser = () => alert('関数実行')
-  
-  // まとめて返却したいのでオブジェクトに設定する
-  return { userList, onClickFetchUser }
+##### 入力(引数)
+
+- 初期値は必要になる。（状態管理だから）
+- 何らかの設定値など
+
+##### 出力(戻り値)
+
+- 状態
+  この状態は最初は引数で与えられた初期値、次は下の状態を操作する関数で変更された状態
+- 状態を操作する関数
+  基本はReact Hooksで生成される状態を操作する関数
+  状態を操作する関数をさらに関数内で使用してその関数を返却することも可能。
+
+```ts
+// 検索ロジックのカスタムフック
+// src/hooks/useSearch.ts
+import { useState, useMemo } from "react";
+
+// 今回作成しいてるカスタムフックのuseSearchの引数の型定義
+interface UseSearchProps<T> { // <T>はジェネリック、<>は型が未決定だから
+  data: T[]; //検索対象のレコード配列
+  searchFields: (keyof T)[]; //検索対象列の配列
+}
+
+// 今回作成しいてるカスタムフックのuseSearchの戻り値の型定義
+interface UseSearchReturn<T> {
+  searchTerm: string; //検索文言
+  setSearchTerm: (term: string) => void; //状態を操作する関数
+  filteredData: T[]; //検索された結果のレコード配列
+}
+
+export function useSearch<T>({
+  data, //検索対象のレコード配列
+  searchFields //検索対象列の配列
+}: UseSearchProps<T>): UseSearchReturn<T> { //ジェネリック。型が未定義だから<T>
+  const [searchTerm, setSearchTerm] = useState(""); //カスタムフック内で使うReact Hooks
+
+  const filteredData = useMemo(() => {
+    if (!searchTerm.trim()) {
+      return data; //検索文言が未設定ならそのまま返却
+    }
+
+    return data.filter(item =>
+      searchFields.some(field => {
+        const value = item[field];
+        return typeof value === 'string' &&
+               value.toLowerCase().includes(searchTerm.toLowerCase());
+      })
+    );
+  }, [data, searchTerm, searchFields]); //useMemoの依存配列
+
+  return {
+    searchTerm, //検索文言。検索文言を渡すのはコンポーネント側では管理できてないから。
+    setSearchTerm, //検索文言の状態を操作する関数
+    filteredData //検索後のレコード配列
+  };
 }
 ```
 
+```tsx
+// 上の使用箇所
+
+import { useSearch } from "@/hooks/useSearch";
+
+// 検索機能（全データから検索、通常時は表示データのみ）
+  const { searchTerm, setSearchTerm, filteredData: searchResults } = useSearch({
+    data: initialData,
+    searchFields: ['title', 'themeName']
+  });
+```
